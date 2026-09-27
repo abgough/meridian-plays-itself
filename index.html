@@ -46,7 +46,16 @@
 
   .where { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--panel); border-radius: 8px; padding: 10px 12px; max-width: 760px; }
   .where label { font-size: 12px; color: var(--muted); flex-basis: 100%; }
-  .where input { flex: 1 1 200px; min-width: 0; font-family: var(--body); font-size: 15px; color: var(--ink); background: var(--panel-2); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; }
+  .where input { width: 100%; min-width: 0; font-family: var(--body); font-size: 16px; color: var(--ink); background: var(--panel-2); border: 1px solid var(--rule); border-radius: 6px; padding: 9px 10px; }
+  .combo { position: relative; flex: 1 1 220px; min-width: 0; }
+  .suggest { position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 30; list-style: none; margin: 0; padding: 4px; background: var(--panel-2); border: 1px solid var(--rule); border-radius: 8px; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45); max-height: 320px; overflow-y: auto; }
+  .suggest[hidden] { display: none; }
+  .suggest li { display: grid; gap: 1px; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+  .suggest li b { font-weight: 600; font-size: 15px; }
+  .suggest li span { font-size: 12px; color: var(--muted); }
+  .suggest li[aria-selected="true"], .suggest li:hover { background: rgba(239, 93, 168, 0.18); }
+  .suggest .none { cursor: default; color: var(--muted); font-size: 13px; }
+  .suggest .none:hover { background: none; }
   .btn { font-size: 14px; font-weight: 600; color: var(--ink); background: var(--panel-2); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 12px; }
   .where .msg { flex-basis: 100%; margin: 0; font-size: 12px; color: var(--muted); min-height: 1.2em; }
 
@@ -60,9 +69,50 @@
   #map { width: 100%; max-width: 100%; aspect-ratio: 1 / 1; display: block; background: var(--panel); border-radius: 8px; }
   .mapwrap { position: relative; }
   .pick { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; text-align: center; background: rgba(15, 27, 45, 0.72); border-radius: 8px; }
+  .pick[hidden] { display: none; }
   .pick-title { margin: 0; font-family: var(--display); font-weight: 600; font-size: 26px; letter-spacing: 0.04em; text-transform: uppercase; }
   .pick-btn { font-family: var(--display); font-weight: 600; font-size: 20px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--bg); background: var(--beam); border: 0; border-radius: 999px; padding: 10px 24px 9px; }
   .pick-note { margin: 0; max-width: 36ch; font-size: 13px; color: var(--muted); }
+  .play { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 10px; background: none; border: 0; color: var(--ink); padding: 8px; }
+  .play[hidden] { display: none; }
+  .play-icon { width: 84px; height: 84px; border-radius: 50%; background: var(--beam); display: grid; place-items: center; box-shadow: 0 0 0 0 rgba(239, 93, 168, 0.55); animation: pulse 2.2s ease-out infinite; }
+  .play-icon::before { content: ""; margin-left: 7px; border-style: solid; border-width: 17px 0 17px 28px; border-color: transparent transparent transparent var(--bg); }
+  .play-label { white-space: nowrap; font-family: var(--display); font-weight: 600; font-size: 18px; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(15, 27, 45, 0.8); padding: 2px 10px; border-radius: 6px; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 93, 168, 0.55); } 70% { box-shadow: 0 0 0 26px rgba(239, 93, 168, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 93, 168, 0); } }
+  @media (prefers-reduced-motion: reduce) { .play-icon { animation: none; } }
+  .card { position: absolute; left: 10px; right: 10px; bottom: 10px; max-width: 360px; background: rgba(19, 35, 56, 0.96); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 14px 12px; display: grid; gap: 6px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45); }
+  .card[hidden] { display: none; }
+  .card-x { position: absolute; top: 4px; right: 6px; width: 32px; height: 32px; border: 0; background: none; color: var(--muted); font-size: 22px; line-height: 1; }
+  .card-cs { margin: 0; font-family: var(--display); font-weight: 800; font-size: 26px; line-height: 1; letter-spacing: 0.02em; }
+  .card-kind { margin: 0; font-size: 13px; color: var(--muted); }
+  .card-dl { margin: 2px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 13px; }
+  .card-dl dt { color: var(--muted); }
+  .card-dl dd { margin: 0; font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .card-link { font-size: 13px; color: var(--beam); }
+  .maptip { margin: 0; font-size: 12px; color: var(--muted); }
+
+  .tune { background: var(--panel); border-radius: 8px; }
+  .tune > summary { cursor: pointer; list-style: none; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; padding: 12px 14px; }
+  .tune > summary::-webkit-details-marker { display: none; }
+  .tune > summary h2 { font-size: 19px; }
+  .tune > summary h2::before { content: "+ "; color: var(--beam); }
+  .tune[open] > summary h2::before { content: "\2212  "; }
+  .tune-sum { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .tune-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px 22px; padding: 4px 14px 16px; }
+  @media (min-width: 640px) { .tune-body { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .fld { display: grid; gap: 6px; align-content: start; }
+  .fld > label, .fld > .lab { font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+  .fld output { font-family: var(--mono); text-transform: none; letter-spacing: 0; color: var(--ink); }
+  .fld select { font: inherit; font-size: 15px; color: var(--ink); background: var(--panel-2); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; width: 100%; }
+  .fld input[type="range"] { width: 100%; accent-color: var(--beam); }
+  .fld input[type="range"]:disabled { opacity: 0.35; }
+  .seg { display: inline-flex; background: var(--panel-2); border-radius: 999px; padding: 3px; gap: 2px; justify-self: start; }
+  .seg button { border: 0; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; padding: 5px 14px; border-radius: 999px; }
+  .seg button[aria-pressed="true"] { background: var(--beam); color: var(--bg); }
+  .fld .note-s { font-size: 12px; color: var(--muted); margin: 0; }
+  .check { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+  .check input { accent-color: var(--beam); width: 18px; height: 18px; }
+  .tune-foot { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
   .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
@@ -110,24 +160,24 @@
     <p class="hint">The sky plays back 45 seconds behind real time. On iPhone, turn off Silent Mode to hear it.</p>
   </header>
 
-  <form class="where" id="whereForm" autocomplete="off">
-    <label for="place">Or listen somewhere else</label>
-    <input id="place" type="search" placeholder="City, address, or ZIP" enterkeyhint="search">
-    <button class="btn" type="submit">Go</button>
-    <button class="btn" type="button" id="geo">Use my location</button>
-    <p class="msg" id="whereMsg"></p>
-  </form>
-
   <div class="banner" id="sampleBanner" hidden><b>Sample traffic.</b> The live aircraft feed couldn't be reached, so these flights are generated to show how it plays. The page keeps trying and switches to real aircraft as soon as the feed answers.</div>
 
   <main class="grid">
     <section class="scope" aria-label="Radar">
       <div class="mapwrap">
         <canvas id="map"></canvas>
+        <button class="play" id="play" type="button" hidden><span class="play-icon" aria-hidden="true"></span><span class="play-label">Tap to hear the sky</span></button>
+        <div class="card" id="card" hidden aria-live="polite">
+          <button class="card-x" id="cardClose" type="button" aria-label="Close">&times;</button>
+          <p class="card-cs" id="cardCs"></p>
+          <p class="card-kind" id="cardKind"></p>
+          <dl class="card-dl" id="cardDl"></dl>
+          <a class="card-link" id="cardLink" href="#" target="_blank" rel="noopener">Follow this flight on adsb.lol</a>
+        </div>
         <div class="pick" id="pick">
-          <p class="pick-title">Listen to the sky above you</p>
-          <button class="pick-btn" type="button" id="pickGeo">Use my location</button>
-          <p class="pick-note">Your location stays on your device. Only a rough area, about 7 miles across, is used to look up nearby planes. You can also search for any place above.</p>
+          <p class="pick-title" id="pickTitle">Finding the sky above you…</p>
+          <button class="pick-btn" type="button" id="pickGeo" hidden>Use my location</button>
+          <p class="pick-note" id="pickNote">Your location stays on your device. Only a rough area, about 7 miles across, is used to look up nearby planes and name the town.</p>
         </div>
       </div>
       <div class="legend">
@@ -136,6 +186,90 @@
         <span><i class="sw" style="background:var(--mid)"></i>10,000–25,000 ft</span>
         <span><i class="sw" style="background:var(--high)"></i>Above 25,000 ft</span>
       </div>
+      <p class="maptip">Tap a plane to see what it is.</p>
+
+      <form class="where" id="whereForm" autocomplete="off" role="search">
+        <label for="place">Listen somewhere else</label>
+        <div class="combo">
+          <input id="place" type="search" placeholder="Start typing a city, address, or ZIP" enterkeyhint="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggest" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <ul id="suggest" class="suggest" role="listbox" aria-label="Suggested places" hidden></ul>
+        </div>
+        <button class="btn" type="submit">Go</button>
+        <button class="btn" type="button" id="geo">Use my location</button>
+        <p class="msg" id="whereMsg" aria-live="polite"></p>
+      </form>
+
+      <details class="tune" id="tune">
+        <summary><h2>Tune the sweep</h2><span class="tune-sum" id="tuneSum"></span></summary>
+        <div class="tune-body">
+          <div class="fld">
+            <span class="lab">Beam reach <output id="reachOut"></output></span>
+            <div class="seg" role="group" aria-label="Beam reach"><button type="button" data-set="reachMode" data-val="auto">Auto</button><button type="button" data-set="reachMode" data-val="set">Set</button></div>
+            <input id="reach" type="range" min="20" max="285" step="5" aria-label="Beam reach in miles">
+          </div>
+          <div class="fld">
+            <span class="lab">Tempo <output id="tempoOut"></output></span>
+            <div class="seg" role="group" aria-label="Tempo"><button type="button" data-set="tempoMode" data-val="auto">Auto</button><button type="button" data-set="tempoMode" data-val="set">Set</button></div>
+            <input id="npm" type="range" min="20" max="160" step="5" aria-label="Notes per minute">
+          </div>
+          <div class="fld">
+            <label for="pitch">Pitch follows</label>
+            <select id="pitch">
+              <option value="distance">Distance: close planes sing high</option>
+              <option value="altitude">Altitude: high planes sing high</option>
+              <option value="direction">Direction: around the compass</option>
+              <option value="speed">Speed: fast planes sing high</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label for="sound2">Sound</label>
+            <select id="sound2">
+              <option value="auto">By aircraft type</option>
+              <option value="bell">Bells</option>
+              <option value="pluck">Plucked strings</option>
+              <option value="glass">Glass</option>
+              <option value="heavy">Big swells</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label for="scale">Scale</label>
+            <select id="scale">
+              <option value="majpent">Major pentatonic (bright)</option>
+              <option value="minpent">Minor pentatonic (moody)</option>
+              <option value="major">Major</option>
+              <option value="minor">Minor</option>
+              <option value="dorian">Dorian (jazzy)</option>
+              <option value="lydian">Lydian (dreamy)</option>
+              <option value="whole">Whole tone (floaty)</option>
+              <option value="blues">Blues</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label for="key">Key</label>
+            <select id="key">
+              <option value="0">C</option><option value="1">C♯ / D♭</option><option value="2">D</option><option value="3">E♭</option>
+              <option value="4">E</option><option value="5">F</option><option value="6">F♯ / G♭</option><option value="7">G</option>
+              <option value="8">A♭</option><option value="9">A</option><option value="10">B♭</option><option value="11">B</option>
+            </select>
+          </div>
+          <div class="fld">
+            <span class="lab">Timing <output id="bpmOut"></output></span>
+            <div class="seg" role="group" aria-label="Timing"><button type="button" data-set="timing" data-val="free">As they cross</button><button type="button" data-set="timing" data-val="beat">On the beat</button></div>
+            <input id="bpm" type="range" min="60" max="160" step="2" aria-label="Beats per minute">
+            <p class="note-s">On the beat holds each note until the next eighth note, so the sky plays in time.</p>
+          </div>
+          <div class="fld">
+            <span class="lab">Echo <output id="echoOut"></output></span>
+            <input id="echo" type="range" min="0" max="100" step="5" aria-label="Echo">
+            <span class="lab" style="margin-top:6px">Volume <output id="volOut"></output></span>
+            <input id="vol" type="range" min="0" max="100" step="5" aria-label="Volume">
+          </div>
+          <div class="fld">
+            <label class="check"><input id="labels" type="checkbox"> Label every plane</label>
+          </div>
+          <div class="tune-foot"><button class="btn" type="button" id="resetTune">Back to defaults</button></div>
+        </div>
+      </details>
     </section>
     <aside class="side" aria-label="Notes played">
       <div class="side-head"><h2>Notes</h2><span class="count"><span id="count">0</span> this session · <span id="rate">0</span>/min</span></div>
@@ -155,16 +289,17 @@
     <dl>
       <div><dt>The beam</dt><dd>A line from the center sweeps clockwise like a radar. Each plane it passes plays one note.</dd></div>
       <div><dt>Reach and tempo</dt><dd>The beam reaches out until it has about two dozen airborne planes to play, from 60 miles on a busy afternoon to nearly 300 in the middle of the night. It sweeps faster when there are few planes and slower when there are many, so the music stays between about 40 and 100 notes a minute.</dd></div>
-      <div><dt>Distance</dt><dd>Sets the pitch on a five-note scale. Planes close to the center sing high; planes at the edge of the beam sound low.</dd></div>
+      <div><dt>Distance</dt><dd>By default, sets the pitch on a five-note scale. Planes close to the center sing high; planes at the edge of the beam sound low.</dd></div>
       <div><dt>Altitude</dt><dd>Sets the register. Below 10,000 ft (mostly arrivals and departures) plays an octave down, and above 25,000 ft (jets at cruise) plays an octave up.</dd></div>
       <div><dt>Aircraft class</dt><dd>Sets the instrument and rhythm. Small planes and regional jets pluck, airliners ring like a bell, heavies swell with a double strike, and helicopters chop in threes.</dd></div>
       <div><dt>Where it is</dt><dd>Planes east of you sound in your right ear and planes to the west in your left.</dd></div>
+      <div><dt>Make it yours</dt><dd>Open Tune the sweep to set how far the beam reaches, how fast it plays, what sets the pitch, and the scale, key, and sound. On the beat locks the notes to a tempo. Tap any plane to see its callsign, type, altitude, and speed.</dd></div>
     </dl>
   </section>
 
   <footer>
     <p>Aircraft positions come from adsb.lol, a community network of volunteer ADS-B receivers. The page asks for everything within about 290 miles of your rough area every 15 seconds, and everyone listening to the same area shares that answer. The page plays it back 45 seconds behind real time, which lets it place each plane between two known positions.</p>
-    <p>Receivers sit on land, so over open ocean or very remote areas the beam can come up short. Place search by OpenStreetMap. Times in the list are the real moments the beam reached each plane, in your local time. Nothing is pre-recorded.</p>
+    <p>Receivers sit on land, so over open ocean or very remote areas the beam can come up short. Place search by Photon and OpenStreetMap. Times in the list are the real moments the beam reached each plane, in your local time. Nothing is pre-recorded.</p>
   </footer>
 </div>
 
@@ -194,6 +329,12 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   const wrap = (d) => ((((d + 180) % 360) + 360) % 360) - 180;
   const TAU = Math.PI * 2;
 
+  // ---------- Settings (remembered on this device only) ----------
+  const DEFAULTS = { reachMode: "auto", reach: 150, tempoMode: "auto", npm: 60, pitch: "distance", sound: "auto", scale: "majpent", key: 0, timing: "free", bpm: 96, echo: 40, vol: 85, labels: false };
+  const S = { ...DEFAULTS };
+  try { Object.assign(S, JSON.parse(localStorage.getItem("skysweep-settings") || "{}")); } catch (e) {}
+  function saveSettings() { try { localStorage.setItem("skysweep-settings", JSON.stringify(S)); } catch (e) {} }
+
   const center = loadCenter(); // { lat, lon, name }, or lat null until the visitor chooses
   function loadCenter() {
     try {
@@ -218,8 +359,30 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   const compass = (b) => COMPASS[Math.round(b / (TAU / 8)) % 8];
 
   // ---------- Music mapping ----------
-  // A two-octave C major pentatonic, low (edge of the beam) to high (center)
-  const SCALE = [["C", 4, 60], ["D", 4, 62], ["E", 4, 64], ["G", 4, 67], ["A", 4, 69], ["C", 5, 72], ["D", 5, 74], ["E", 5, 76], ["G", 5, 79]];
+  // Two octaves of the chosen scale in the chosen key, low to high
+  const SCALES = {
+    majpent: { name: "major pentatonic", iv: [0, 2, 4, 7, 9] },
+    minpent: { name: "minor pentatonic", iv: [0, 3, 5, 7, 10] },
+    major: { name: "major", iv: [0, 2, 4, 5, 7, 9, 11] },
+    minor: { name: "minor", iv: [0, 2, 3, 5, 7, 8, 10] },
+    dorian: { name: "Dorian", iv: [0, 2, 3, 5, 7, 9, 10] },
+    lydian: { name: "Lydian", iv: [0, 2, 4, 6, 7, 9, 11] },
+    whole: { name: "whole tone", iv: [0, 2, 4, 6, 8, 10] },
+    blues: { name: "blues", iv: [0, 3, 5, 6, 7, 10] },
+  };
+  const KEYNAMES = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+  const PCNAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  let NOTES = [];
+  function buildScale() {
+    const sc = SCALES[S.scale] || SCALES.majpent;
+    const key = Number(S.key) || 0;
+    const base = 60 + key - (key >= 6 ? 12 : 0);
+    NOTES = [];
+    for (let o = 0; o < 2; o++) for (const iv of sc.iv) NOTES.push(base + 12 * o + iv);
+    NOTES.push(base + 24);
+  }
+  const noteName = (m) => PCNAMES[((m % 12) + 12) % 12] + (Math.floor(m / 12) - 1);
+  buildScale();
   const SHIFT = { low: -12, mid: 0, high: 12 };
   const INST_LABEL = { pluck: "Small aircraft", bell: "Airliner", heavy: "Heavy", rotor: "Helicopter", glass: "Other" };
   const altBand = (alt) => (alt < 10000 ? "low" : alt < 25000 ? "mid" : "high");
@@ -297,6 +460,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   let P = 20, Ptarget = 20;     // seconds per revolution (eased)
   let theta = 0;                // beam bearing, radians clockwise from north
   let inRange = 0;
+  let autoR = 150;
   let lastFrame = performance.now();
   const visible = [];           // planes on the playback clock: { a, p, r }
 
@@ -313,9 +477,13 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   }
   function retune() {
     const airborne = visible.filter((v) => !v.p.ground && v.p.alt != null).map((v) => v.r.d).sort((x, y) => x - y);
-    Rtarget = airborne.length >= TARGET_PLANES ? Math.max(R_MIN, Math.min(R_MAX, airborne[TARGET_PLANES - 1] * 1.08)) : R_MAX;
+    autoR = airborne.length >= TARGET_PLANES ? Math.max(R_MIN, Math.min(R_MAX, airborne[TARGET_PLANES - 1] * 1.08)) : R_MAX;
+    Rtarget = S.reachMode === "set" ? Number(S.reach) : autoR;
     inRange = airborne.filter((d) => d <= R).length;
-    Ptarget = Math.max(P_MIN, Math.min(P_MAX, inRange / NOTES_PER_SEC));
+    Ptarget = S.tempoMode === "set"
+      ? Math.max(3, Math.min(90, (Math.max(1, inRange) * 60) / Number(S.npm)))
+      : Math.max(P_MIN, Math.min(P_MAX, inRange / NOTES_PER_SEC));
+    renderReadouts();
   }
   setInterval(retune, 2000);
 
@@ -335,15 +503,19 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
 
   function hit(v, now) {
     const { a, p, r } = v;
-    const k = Math.max(0, Math.min(1, 1 - r.d / R)); // 1 at the center, 0 at the edge
-    const idx = Math.round(k * (SCALE.length - 1));
-    const [letter, oct, midi] = SCALE[idx];
+    const clamp01 = (x) => Math.max(0, Math.min(1, x));
+    let k;
+    if (S.pitch === "altitude") k = clamp01(p.alt / 42000);
+    else if (S.pitch === "direction") k = r.b / TAU;
+    else if (S.pitch === "speed") k = clamp01(((p.gs ?? 250) - 80) / 480);
+    else k = clamp01(1 - r.d / R); // 1 at the center, 0 at the edge
+    const idx = Math.round(k * (NOTES.length - 1));
     const band = altBand(p.alt);
-    const shift = SHIFT[band];
-    const inst = instrumentFor(a.cat);
+    const shift = S.pitch === "altitude" ? 0 : SHIFT[band];
+    const inst = S.sound === "auto" ? instrumentFor(a.cat) : S.sound;
     const pan = Math.max(-0.8, Math.min(0.8, r.dx / R));
-    const m = midi + shift;
-    const name = letter + (oct + shift / 12);
+    const m = NOTES[idx] + shift;
+    const name = noteName(m);
     playNote({ midi: m, dur: Math.min(durationFor(p.gs), Math.max(0.4, P / 6)), pan, inst, vel: inst === "pluck" ? 0.8 : 1 });
     notes++;
     recentTimes.push(now);
@@ -394,18 +566,18 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     const ctx = new Ctx();
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -18; comp.ratio.value = 4; comp.attack.value = 0.01; comp.release.value = 0.3;
-    const out = ctx.createGain(); out.gain.value = 0.85;
+    const out = ctx.createGain(); out.gain.value = Number(S.vol) / 100;
     comp.connect(out); out.connect(ctx.destination);
     const bus = ctx.createGain();
     const conv = ctx.createConvolver();
     conv.buffer = makeIR(ctx, 3.4);
-    const wet = ctx.createGain(); wet.gain.value = 0.34;
+    const wet = ctx.createGain(); wet.gain.value = (Number(S.echo) / 100) * 0.85;
     bus.connect(comp); bus.connect(conv); conv.connect(wet); wet.connect(comp);
     const nlen = ctx.sampleRate * 0.2;
     const noise = ctx.createBuffer(1, nlen, ctx.sampleRate);
     const nd = noise.getChannelData(0);
     for (let i = 0; i < nlen; i++) nd[i] = Math.random() * 2 - 1;
-    A = { ctx, bus, noise };
+    A = { ctx, bus, noise, out, wet };
   }
   function makeIR(ctx, sec) {
     const len = Math.floor(ctx.sampleRate * sec);
@@ -502,7 +674,8 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   const VOICES = { bell, pluck, heavy, rotor, glass };
   function playNote({ midi, dur, pan, inst, vel }) {
     if (!soundOn || !A || A.ctx.state !== "running") return;
-    const t = A.ctx.currentTime + 0.02;
+    let t = A.ctx.currentTime + 0.02;
+    if (S.timing === "beat") { const grid = 60 / Number(S.bpm) / 2; t = Math.ceil(t / grid) * grid; }
     while (voiceEnds.length && voiceEnds[0] < t) voiceEnds.shift();
     if (voiceEnds.length >= 14) return;
     const busy = voiceEnds.length;
@@ -513,7 +686,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   }
 
   let wakeLock = null;
-  $("sound").addEventListener("click", async () => {
+  async function toggleSound() {
     const btn = $("sound");
     if (!soundOn) {
       try {
@@ -522,7 +695,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
         soundOn = true;
         btn.textContent = "Mute";
         btn.setAttribute("aria-pressed", "true");
-        playNote({ midi: 72, dur: 0.8, pan: 0, inst: "glass", vel: 0.7 });
+        playNote({ midi: NOTES[Math.floor(NOTES.length / 2)] || 72, dur: 0.8, pan: 0, inst: "glass", vel: 0.7 });
         try { if (navigator.wakeLock) wakeLock = await navigator.wakeLock.request("screen"); } catch (e) {}
       } catch (e) { btn.textContent = "Sound unavailable"; }
     } else {
@@ -532,7 +705,11 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
       btn.setAttribute("aria-pressed", "false");
       try { if (wakeLock) { wakeLock.release(); wakeLock = null; } } catch (e) {}
     }
-  });
+    updatePlay();
+  }
+  $("sound").addEventListener("click", toggleSound);
+  $("play").addEventListener("click", () => { if (!soundOn) toggleSound(); });
+  function updatePlay() { $("play").hidden = !hasCenter() || soundOn; }
   document.addEventListener("visibilitychange", async () => {
     if (document.visibilityState === "visible" && soundOn) {
       try { if (A && A.ctx.state !== "running") await A.ctx.resume(); } catch (e) {}
@@ -789,6 +966,14 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
       g.fillStyle = col;
       g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.lineTo(ccx, ccy); g.lineTo(dx, dy); g.closePath(); g.fill();
       g.globalAlpha = 1;
+      if (a.hex === selected) {
+        g.strokeStyle = C.ink; g.lineWidth = 2;
+        g.beginPath(); g.arc(x, y, 12, 0, TAU); g.stroke();
+      }
+      if (S.labels && inside && !(a.flash && now - a.flash < 2600)) {
+        g.font = `10px ${fonts.mono}`; g.textAlign = "left"; g.textBaseline = "middle";
+        g.fillStyle = alpha(C.ink, 0.7); g.fillText(a.cs, x + 8, y);
+      }
       if (a.flash && now - a.flash < 2600) {
         const age = (now - a.flash) / 2600;
         const fc = bandColor(a.flashBand);
@@ -800,15 +985,31 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
         g.fillText(a.cs, x + 10, y + 12);
       }
     }
-    // center
-    g.fillStyle = C.ink; g.beginPath(); g.arc(cx, cy, 3, 0, TAU); g.fill();
-    g.strokeStyle = C.ink; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, 7, 0, TAU); g.stroke();
+    // center: a pulsing marker and a label so it's clear where the radar is listening from
+    if (hasCenter()) {
+      const ph = (Date.now() % 2400) / 2400;
+      g.strokeStyle = alpha(C.beam, 0.7 * (1 - ph)); g.lineWidth = 2;
+      g.beginPath(); g.arc(cx, cy, 8 + ph * 26, 0, TAU); g.stroke();
+      g.fillStyle = C.beam; g.beginPath(); g.arc(cx, cy, 5, 0, TAU); g.fill();
+      g.strokeStyle = C.ink; g.lineWidth = 1.5; g.beginPath(); g.arc(cx, cy, 9, 0, TAU); g.stroke();
+      const label = center.kind === "you" ? "YOU" : (center.name || "").split(",")[0].toUpperCase();
+      g.font = `600 14px ${fonts.display}`; g.textAlign = "center"; g.textBaseline = "top";
+      g.lineWidth = 4; g.strokeStyle = alpha(C.bg, 0.85); g.strokeText(label, cx, cy + 15);
+      g.fillStyle = C.ink; g.fillText(label, cx, cy + 15);
+      if (center.kind === "you" && center.town) {
+        g.font = `10px ${fonts.mono}`;
+        g.strokeText(center.town, cx, cy + 32); g.fillStyle = alpha(C.ink, 0.75); g.fillText(center.town, cx, cy + 32);
+      }
+    } else {
+      g.fillStyle = C.ink; g.beginPath(); g.arc(cx, cy, 3, 0, TAU); g.fill();
+      g.strokeStyle = C.ink; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, 7, 0, TAU); g.stroke();
+    }
   }
 
   // Grand staff: notes placed by pitch, treble above middle C and bass below
   function staffStep(midi) { // diatonic steps from middle C (C4 = 0)
     const pc = ((midi % 12) + 12) % 12, oct = Math.floor(midi / 12) - 1;
-    const idx = { 0: 0, 2: 1, 4: 2, 5: 3, 7: 4, 9: 5, 11: 6 }[pc] ?? 0;
+    const idx = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6][pc];
     return (oct - 4) * 7 + idx;
   }
   function drawScore(now) {
@@ -872,21 +1073,102 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   function renderWhere() {
     $("where").textContent = hasCenter() ? center.name : "No place chosen yet";
     $("pick").hidden = hasCenter();
+    updatePlay();
   }
-  function setCenter(lat, lon, name) {
-    center.lat = lat; center.lon = lon; center.name = name;
+  function showPickError(text) {
+    if (hasCenter()) return;
+    $("pickTitle").textContent = "Where should we listen?";
+    $("pickGeo").hidden = false;
+    $("pickGeo").textContent = "Try my location again";
+    $("pickNote").textContent = text || "Or start typing a place in the search box below the radar.";
+  }
+  function setCenter(lat, lon, name, kind) {
+    center.lat = lat; center.lon = lon; center.name = name; center.kind = kind || "place"; center.town = "";
     renderWhere();
-    ac.clear(); events.length = 0;
-    R = Rtarget = 150; P = Ptarget = 20;
+    ac.clear(); events.length = 0; selected = null; $("card").hidden = true;
+    R = Rtarget = S.reachMode === "set" ? Number(S.reach) : 150; P = Ptarget = 20;
     if (mode === "sample") sim.seed();
     drawLayer();
     restartPolling();
   }
+  // Place search: suggestions appear as you type (Photon), with OpenStreetMap as a fallback on Go
+  const place = $("place"), sug = $("suggest");
+  let sugItems = [], sugActive = -1, sugTimer = null, sugCtl = null, sugSeq = 0;
+  function closeSug() { sug.hidden = true; place.setAttribute("aria-expanded", "false"); place.removeAttribute("aria-activedescendant"); sugActive = -1; }
+  function renderSug() {
+    sug.textContent = "";
+    if (!sugItems.length) {
+      const li = document.createElement("li"); li.className = "none"; li.textContent = "No matches yet. Keep typing.";
+      sug.append(li);
+    }
+    sugItems.forEach((it, i) => {
+      const li = document.createElement("li");
+      li.id = "sg-" + i; li.setAttribute("role", "option"); li.setAttribute("aria-selected", String(i === sugActive));
+      const b = document.createElement("b"); b.textContent = it.main;
+      const sp = document.createElement("span"); sp.textContent = it.sub;
+      li.append(b, sp);
+      li.addEventListener("pointerdown", (ev) => { ev.preventDefault(); choose(i); });
+      sug.append(li);
+    });
+    sug.hidden = false; place.setAttribute("aria-expanded", "true");
+    if (sugActive >= 0) place.setAttribute("aria-activedescendant", "sg-" + sugActive); else place.removeAttribute("aria-activedescendant");
+  }
+  function describe(pr) {
+    const street = [pr.housenumber, pr.street].filter(Boolean).join(" ");
+    const main = pr.name || street || pr.city || pr.county || pr.state || pr.country || "Unnamed place";
+    const parts = [pr.name && street && street !== pr.name ? street : "", pr.city || pr.town || pr.district || pr.county, pr.state, pr.country];
+    const sub = [...new Set(parts.filter((x) => x && x !== main))].join(", ");
+    return { main, sub };
+  }
+  async function fetchSug(q) {
+    const seq = ++sugSeq;
+    if (sugCtl) sugCtl.abort();
+    sugCtl = new AbortController();
+    const bias = hasCenter() ? `&lat=${center.lat.toFixed(1)}&lon=${center.lon.toFixed(1)}` : "";
+    try {
+      const r = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6&lang=en${bias}`, { signal: sugCtl.signal });
+      const j = await r.json();
+      if (seq !== sugSeq) return;
+      const seen = new Set();
+      sugItems = (j.features || []).map((f) => {
+        const { main, sub } = describe(f.properties || {});
+        const [lon, lat] = f.geometry.coordinates;
+        return { main, sub, lat, lon };
+      }).filter((it) => { const k = it.main + "|" + it.sub; if (seen.has(k)) return false; seen.add(k); return true; });
+      sugActive = sugItems.length ? 0 : -1;
+      if (place.value.trim().length >= 3 && document.activeElement === place) renderSug();
+    } catch (e) {
+      if (e.name !== "AbortError" && seq === sugSeq) closeSug();
+    }
+  }
+  function choose(i) {
+    const it = sugItems[i];
+    if (!it) return;
+    const label = it.sub ? `${it.main}, ${it.sub.split(", ")[0]}` : it.main;
+    setCenter(it.lat, it.lon, label, "place");
+    $("whereMsg").textContent = `Listening over ${label}.`;
+    place.value = ""; sugItems = []; closeSug(); place.blur();
+  }
+  place.addEventListener("input", () => {
+    clearTimeout(sugTimer);
+    const q = place.value.trim();
+    if (q.length < 3) { sugSeq++; closeSug(); return; }
+    sugTimer = setTimeout(() => fetchSug(q), 250);
+  });
+  place.addEventListener("keydown", (e) => {
+    if (sug.hidden || !sugItems.length) { if (e.key === "Escape") closeSug(); return; }
+    if (e.key === "ArrowDown") { e.preventDefault(); sugActive = (sugActive + 1) % sugItems.length; renderSug(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); sugActive = (sugActive - 1 + sugItems.length) % sugItems.length; renderSug(); }
+    else if (e.key === "Escape") { closeSug(); }
+  });
+  place.addEventListener("blur", () => setTimeout(closeSug, 150));
+  place.addEventListener("focus", () => { if (place.value.trim().length >= 3 && sugItems.length) renderSug(); });
   $("whereForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const q = $("place").value.trim();
+    const q = place.value.trim();
     const msg = $("whereMsg");
     if (!q) { msg.textContent = "Type a city, address, or ZIP code."; return; }
+    if (sugItems.length) { choose(Math.max(0, sugActive)); return; }
     msg.textContent = "Looking it up…";
     try {
       const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`, { headers: { Accept: "application/json" } });
@@ -895,34 +1177,132 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
       const name = j[0].display_name.split(",").slice(0, 2).map((s) => s.trim()).join(", ");
       setCenter(parseFloat(j[0].lat), parseFloat(j[0].lon), name);
       msg.textContent = `Listening over ${name}.`;
-      $("place").value = "";
+      place.value = ""; closeSug(); place.blur();
     } catch (err) {
       msg.textContent = "Place search isn't reachable right now. Try Use my location instead.";
     }
   });
   function useMyLocation() {
     const msg = $("whereMsg");
-    if (!navigator.geolocation) { msg.textContent = "Location isn't available in this browser. Search for a place instead."; return; }
+    if (!navigator.geolocation) { msg.textContent = "Location isn't available in this browser. Search for a place instead."; showPickError("Location isn't available in this browser. Start typing a place in the search box below the radar."); return; }
     msg.textContent = "Finding your location…";
+    if (!hasCenter()) { $("pickTitle").textContent = "Finding the sky above you…"; $("pickGeo").hidden = true; }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         // Round to about 7 miles right away; the exact position is never used or sent anywhere
         const lat = Math.round(pos.coords.latitude * 10) / 10, lon = Math.round(pos.coords.longitude * 10) / 10;
-        setCenter(lat, lon, "Your sky");
+        setCenter(lat, lon, "Your location", "you");
         msg.textContent = "Listening above you.";
+        // Name the town from the already-rounded area so the visitor can see where the radar is centered
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&zoom=10&lat=${lat}&lon=${lon}`, { headers: { Accept: "application/json" } })
+          .then((r) => r.json())
+          .then((j) => {
+            if (center.lat !== lat || center.lon !== lon || center.kind !== "you") return;
+            const ad = (j && j.address) || {};
+            const town = ad.city || ad.town || ad.village || ad.hamlet || ad.suburb || ad.county || "";
+            const region = ad.state || ad.region || ad.country || "";
+            const place = [town, region].filter(Boolean).join(", ");
+            if (!place) return;
+            center.town = place; center.name = `Near ${place}`;
+            renderWhere();
+            msg.textContent = `Listening above you, near ${place}.`;
+          })
+          .catch(() => {});
       },
-      () => { msg.textContent = "Location isn't available here. Search for a place instead."; },
+      (err) => {
+        msg.textContent = "Location isn't available here. Search for a place instead.";
+        showPickError(err && err.code === 1 ? "Location is turned off for this page. Start typing a place in the search box below the radar, or allow location in your browser settings." : "");
+      },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }
     );
   }
   $("geo").addEventListener("click", useMyLocation);
   $("pickGeo").addEventListener("click", useMyLocation);
 
+  // ---------- Tap a plane to see what it is ----------
+  let selected = null;
+  const CLASS = { pluck: "Small aircraft", bell: "Airliner", heavy: "Heavy", rotor: "Helicopter", glass: "Other" };
+  function fillCard() {
+    const v = visible.find((x) => x.a.hex === selected);
+    if (!v) { $("card").hidden = true; selected = null; return; }
+    const { a, p, r } = v;
+    $("cardCs").textContent = a.cs;
+    $("cardKind").textContent = [a.type, CLASS[instrumentFor(a.cat)]].filter(Boolean).join(" · ");
+    const rows = [
+      ["Altitude", p.ground ? "On the ground" : p.alt != null ? `${Math.round(p.alt).toLocaleString()} ft` : "Unknown"],
+      ["Speed", p.gs != null ? `${Math.round(p.gs)} kt (${Math.round(p.gs * 1.15078)} mph)` : "Unknown"],
+      ["Heading", p.trk != null ? `${Math.round(p.trk)}° ${compass(rad(p.trk))}` : "Unknown"],
+      ["From center", `${Math.round(r.d)} mi ${compass(r.b)}`],
+      ["Last note", a.flashName || "Not yet"],
+    ];
+    const dl = $("cardDl"); dl.textContent = "";
+    for (const [k, val] of rows) { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = val; dl.append(dt, dd); }
+    const link = $("cardLink");
+    link.hidden = a.hex.startsWith("~");
+    link.href = `https://adsb.lol/?icao=${encodeURIComponent(a.hex)}`;
+    $("card").hidden = false;
+  }
+  map.addEventListener("click", (e) => {
+    if (!V) return;
+    const rect = map.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const scale = V.rPx / R;
+    let best = null, bestD = 24;
+    for (const v of visible) {
+      const x = V.cx + v.r.dx * scale, y = V.cy - v.r.dy * scale;
+      const d = Math.hypot(x - mx, y - my);
+      if (d < bestD) { bestD = d; best = v; }
+    }
+    selected = best ? best.a.hex : null;
+    if (best) fillCard(); else $("card").hidden = true;
+  });
+  $("cardClose").addEventListener("click", () => { selected = null; $("card").hidden = true; });
+  setInterval(() => { if (selected) fillCard(); }, 700);
+
+  // ---------- Tune the sweep ----------
+  function renderReadouts() {
+    const sc = SCALES[S.scale] || SCALES.majpent;
+    $("reachOut").textContent = S.reachMode === "set" ? `${S.reach} mi` : `Auto, now ${Math.round(autoR)} mi`;
+    $("tempoOut").textContent = S.tempoMode === "set" ? `${S.npm} notes/min` : "Auto, 40–100 notes/min";
+    $("bpmOut").textContent = S.timing === "beat" ? `${S.bpm} bpm` : "";
+    $("echoOut").textContent = `${S.echo}%`;
+    $("volOut").textContent = `${S.vol}%`;
+    $("tuneSum").textContent = `${KEYNAMES[Number(S.key)]} ${sc.name} · pitch by ${S.pitch}${S.reachMode === "set" ? ` · ${S.reach} mi` : ""}${S.timing === "beat" ? ` · ${S.bpm} bpm` : ""}`;
+  }
+  function renderTune() {
+    document.querySelectorAll(".seg button[data-set]").forEach((b) => b.setAttribute("aria-pressed", String(S[b.dataset.set] === b.dataset.val)));
+    $("reach").value = S.reach; $("reach").disabled = S.reachMode !== "set";
+    $("npm").value = S.npm; $("npm").disabled = S.tempoMode !== "set";
+    $("bpm").value = S.bpm; $("bpm").hidden = S.timing !== "beat";
+    $("pitch").value = S.pitch; $("sound2").value = S.sound; $("scale").value = S.scale; $("key").value = String(S.key);
+    $("echo").value = S.echo; $("vol").value = S.vol; $("labels").checked = !!S.labels;
+    renderReadouts();
+  }
+  function applyAudio() {
+    if (!A) return;
+    A.out.gain.setTargetAtTime(Number(S.vol) / 100, A.ctx.currentTime, 0.05);
+    A.wet.gain.setTargetAtTime((Number(S.echo) / 100) * 0.85, A.ctx.currentTime, 0.05);
+  }
+  function changed() { buildScale(); saveSettings(); renderTune(); applyAudio(); retune(); }
+  document.querySelectorAll(".seg button[data-set]").forEach((b) => b.addEventListener("click", () => { S[b.dataset.set] = b.dataset.val; changed(); }));
+  $("reach").addEventListener("input", (e) => { S.reach = Number(e.target.value); changed(); });
+  $("npm").addEventListener("input", (e) => { S.npm = Number(e.target.value); changed(); });
+  $("bpm").addEventListener("input", (e) => { S.bpm = Number(e.target.value); changed(); });
+  $("echo").addEventListener("input", (e) => { S.echo = Number(e.target.value); changed(); });
+  $("vol").addEventListener("input", (e) => { S.vol = Number(e.target.value); changed(); });
+  $("pitch").addEventListener("change", (e) => { S.pitch = e.target.value; changed(); });
+  $("sound2").addEventListener("change", (e) => { S.sound = e.target.value; changed(); });
+  $("scale").addEventListener("change", (e) => { S.scale = e.target.value; changed(); });
+  $("key").addEventListener("change", (e) => { S.key = Number(e.target.value); changed(); });
+  $("labels").addEventListener("change", (e) => { S.labels = e.target.checked; changed(); });
+  $("resetTune").addEventListener("click", () => { Object.assign(S, DEFAULTS); changed(); });
+  renderTune();
+
   renderWhere();
   resize();
   setInterval(updateStatus, 1000);
   requestAnimationFrame(frame);
-  if (hasCenter()) poll();
+  if (hasCenter()) poll(); else useMyLocation(); // ask for location right away
   try { document.fonts.ready.then(() => drawLayer()); } catch (e) {}
 })();
 </script>
