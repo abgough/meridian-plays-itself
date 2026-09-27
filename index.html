@@ -71,7 +71,14 @@
   @media (min-width: 980px) { .grid { grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr); align-items: start; } }
 
   .scope { display: flex; flex-direction: column; gap: 10px; }
-  #map { width: 100%; max-width: 100%; aspect-ratio: 1 / 1; display: block; background: var(--panel); border-radius: 8px; }
+  #map { width: 100%; max-width: 100%; aspect-ratio: 1 / 1; display: block; background: var(--panel); border-radius: 8px; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+  #map:active { cursor: grabbing; }
+  .zoom { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .zoom[hidden] { display: none; }
+  .zoom button { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 8px; border: 1px solid var(--rule); background: rgba(19, 35, 56, 0.92); color: var(--ink); font-size: 22px; line-height: 1; padding: 0; }
+  .zoom .zfit { width: auto; height: auto; padding: 7px 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
+  .zoom .zfit[hidden] { display: none; }
+  body.kiosk-idle .zoom { display: none; }
   .mapwrap { position: relative; }
   .pick { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; text-align: center; background: rgba(15, 27, 45, 0.72); border-radius: 8px; }
   .pick[hidden] { display: none; }
@@ -227,6 +234,11 @@
       <div class="mapwrap">
         <canvas id="map"></canvas>
         <button class="play" id="play" type="button" hidden><span class="play-icon" aria-hidden="true"></span><span class="play-label">Tap to hear the sky</span></button>
+        <div class="zoom" id="zoom" role="group" aria-label="Map view" hidden>
+          <button type="button" id="zin" aria-label="Zoom in">+</button>
+          <button type="button" id="zout" aria-label="Zoom out">&minus;</button>
+          <button type="button" id="zfit" class="zfit" hidden>Reset view</button>
+        </div>
         <div class="card" id="card" hidden aria-live="polite">
           <button class="card-x" id="cardClose" type="button" aria-label="Close">&times;</button>
           <p class="card-cs" id="cardCs"></p>
@@ -246,7 +258,7 @@
         <span><i class="sw" style="background:var(--mid)"></i>10,000–25,000 ft</span>
         <span><i class="sw" style="background:var(--high)"></i>Above 25,000 ft</span>
       </div>
-      <p class="maptip">Tap a plane to see what it is.</p>
+      <p class="maptip">Tap a plane to see what it is. Zoom and drag the map to look around; the beam and the music carry on as they are.</p>
 
       <form class="where" id="whereForm" autocomplete="off" role="search">
         <label for="place">Listen somewhere else</label>
@@ -391,7 +403,7 @@
       <div><dt>Altitude</dt><dd>Planes at cruise ring long and airy; planes low near an airport play short, close notes.</dd></div>
       <div><dt>Coming or going</dt><dd>A plane heading toward you scoops up into its note, bright. One heading away sags a little at the end and sounds darker, like a train passing.</dd></div>
       <div><dt>Where it is</dt><dd>Planes east of you sound in your right ear and planes to the west in your left.</dd></div>
-      <div><dt>Make it yours</dt><dd>Open Tune the sweep to set how far the beam reaches, how fast it plays, what sets the pitch, and the scale, key, and sound. On the beat locks the notes to a tempo. Tap any plane to see its callsign, type, altitude, and speed.</dd></div>
+      <div><dt>Make it yours</dt><dd>Open Tune the sweep to set how far the beam reaches, how fast it plays, what sets the pitch, and the scale, key, and sound. On the beat locks the notes to a tempo. Tap any plane to see its callsign, type, altitude, and speed. Zoom out to see the wider sky, or drag the map around; Reset view brings the beam back to center.</dd></div>
     </dl>
   </section>
 
@@ -1098,14 +1110,20 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   const layer = document.createElement("canvas");
   const lctx = layer.getContext("2d");
   let MW = 0, MH = 0, SW = 0, SH = 0, dpr = 1;
-  let V = null, layerR = 0;
+  let V = null, layerR = 0, layerDirty = false;
+  // What the map shows. Following: the listening circle fills the map and grows or shrinks with the beam.
+  // Once someone zooms or drags, the map holds still at their scale (k, px per mile) and offset until they reset it.
+  // None of this touches the beam or the music.
+  const view = { follow: true, k: 1, ox: 0, oy: 0 };
+  const FEED_MI = 287.7; // the feed's reach: 250 nautical miles around the center
 
   function makeView() {
     const half = Math.min(MW, MH) / 2;
-    const s = (half * 0.9) / (R / MI_LAT); // px per degree of latitude; the listening circle fills 90%
+    const k = view.follow ? (half * 0.9) / R : view.k;
+    const s = k * MI_LAT; // px per degree of latitude
     const kx = Math.cos(rad(center.lat));
-    const cx = MW / 2, cy = MH / 2;
-    V = { s, cx, cy, rPx: half * 0.9, xy: (lat, lon) => [cx + wrap(lon - center.lon) * kx * s, cy - (lat - center.lat) * s] };
+    const cx = MW / 2 + (view.follow ? 0 : view.ox), cy = MH / 2 + (view.follow ? 0 : view.oy);
+    V = { k, s, cx, cy, rPx: R * k, xy: (lat, lon) => [cx + wrap(lon - center.lon) * kx * s, cy - (lat - center.lat) * s] };
   }
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -1154,7 +1172,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
       return;
     }
     makeView();
-    layerR = R;
+    layerR = R; layerDirty = false;
     const g = lctx;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.fillStyle = C.panel; g.fillRect(0, 0, MW, MH);
@@ -1192,17 +1210,26 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     g.fillStyle = alpha(C.staff, 0.5); g.textAlign = "center";
     g.fillText("N", V.cx, V.cy - V.rPx - 10 * fs); g.fillText("S", V.cx, V.cy + V.rPx + 10 * fs);
     g.fillText("E", V.cx + V.rPx + 10 * fs, V.cy); g.fillText("W", V.cx - V.rPx - 10 * fs, V.cy);
+    // zoomed out past the beam: show how far the aircraft feed reaches
+    const feedPx = FEED_MI * V.k;
+    if (!view.follow && feedPx > V.rPx * 1.08 && feedPx < Math.max(MW, MH) * 1.5) {
+      g.strokeStyle = alpha(C.staff, 0.28); g.lineWidth = 1; g.setLineDash([1, 6]);
+      g.beginPath(); g.arc(V.cx, V.cy, feedPx, 0, TAU); g.stroke(); g.setLineDash([]);
+      g.fillStyle = alpha(C.staff, 0.5); g.textAlign = "center"; g.textBaseline = "bottom";
+      g.fillText("Edge of the aircraft feed", V.cx, V.cy - feedPx - 4);
+    }
   }
 
   function drawMap(now) {
     if (!V) { const g0 = mctx; g0.setTransform(1, 0, 0, 1, 0, 0); g0.drawImage(layer, 0, 0); return; }
-    if (Math.abs(R - layerR) / layerR > 0.04) drawLayer();
+    if (layerDirty || Math.abs(R - layerR) / layerR > (view.follow ? 0.04 : 0.015)) drawLayer();
     const g = mctx;
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.drawImage(layer, 0, 0);
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const { cx, cy, rPx } = V;
-    const scale = rPx / R; // px per mile
+    const { cx, cy } = V;
+    const scale = V.k; // px per mile
+    const rPx = R * scale;
     const fs = labelScale();
 
     // the beam with a fading trail behind it
@@ -1236,7 +1263,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
         g.strokeStyle = C.ink; g.lineWidth = 2;
         g.beginPath(); g.arc(x, y, 12 * fs, 0, TAU); g.stroke();
       }
-      if (S.labels && inside && !(a.flash && now - a.flash < 2600)) {
+      if (S.labels && inside && rPx >= 150 && !(a.flash && now - a.flash < 2600)) {
         g.font = `${10 * fs}px ${fonts.mono}`; g.textAlign = "left"; g.textBaseline = "middle";
         g.fillStyle = alpha(C.ink, 0.7); g.fillText(a.cs, x + 8 * fs, y);
       }
@@ -1341,6 +1368,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     $("pick").hidden = hasCenter();
     updatePlay();
     if (KIOSK) { $("kWhere").textContent = kioskTitle(); kioskQr(); }
+    $("zoom").hidden = !hasCenter();
   }
   function showPickError(text) {
     if (hasCenter()) return;
@@ -1354,6 +1382,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     renderWhere();
     ac.clear(); events.length = 0; selected = null; $("card").hidden = true;
     resetSession();
+    view.follow = true; viewChanged();
     R = Rtarget = S.reachMode === "set" ? Number(S.reach) : 150; P = Ptarget = 20;
     if (mode === "sample") sim.seed();
     drawLayer();
@@ -1487,6 +1516,91 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   $("geo").addEventListener("click", useMyLocation);
   $("pickGeo").addEventListener("click", useMyLocation);
 
+  // ---------- Zoom and drag the map (view only; the beam and the music are unaffected) ----------
+  let moved = 0, lastInteract = 0, pinch = null;
+  const pointers = new Map();
+  const clampN = (x, a, b) => Math.max(a, Math.min(b, x));
+  function viewChanged() {
+    layerDirty = true;
+    lastInteract = Date.now();
+    $("zfit").hidden = view.follow;
+    map.style.touchAction = view.follow ? "pan-y" : "none"; // once zoomed, one finger moves the map instead of the page
+  }
+  function freeze() {
+    if (!view.follow || !V) return;
+    view.follow = false; view.k = V.k; view.ox = V.cx - MW / 2; view.oy = V.cy - MH / 2;
+  }
+  function clampPan() {
+    const lim = FEED_MI * view.k + Math.min(MW, MH) * 0.25;
+    view.ox = clampN(view.ox, -lim, lim); view.oy = clampN(view.oy, -lim, lim);
+  }
+  function zoomAt(px, py, factor) {
+    if (!V) return;
+    freeze();
+    const half = Math.min(MW, MH) / 2;
+    const k2 = clampN(view.k * factor, half / 900, half / 6); // from about 900 miles across the half-map down to 6
+    const cx = MW / 2 + view.ox, cy = MH / 2 + view.oy;
+    view.ox = px - (px - cx) * (k2 / view.k) - MW / 2;
+    view.oy = py - (py - cy) * (k2 / view.k) - MH / 2;
+    view.k = k2;
+    clampPan(); viewChanged();
+  }
+  function panBy(dx, dy) { if (!V) return; freeze(); view.ox += dx; view.oy += dy; clampPan(); viewChanged(); }
+  function resetView() { view.follow = true; viewChanged(); }
+  const local = (x, y) => { const r = map.getBoundingClientRect(); return [x - r.left, y - r.top]; };
+  // The buttons zoom around the listening point when it's on screen, so the beam stays in view
+  const anchorPt = () => (V && V.cx > 0 && V.cx < MW && V.cy > 0 && V.cy < MH ? [V.cx, V.cy] : [MW / 2, MH / 2]);
+  $("zin").addEventListener("click", () => zoomAt(...anchorPt(), 1.6));
+  $("zout").addEventListener("click", () => zoomAt(...anchorPt(), 1 / 1.6));
+  $("zfit").addEventListener("click", resetView);
+  map.addEventListener("wheel", (e) => {
+    if (!V) return;
+    e.preventDefault();
+    const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1);
+    const [x, y] = local(e.clientX, e.clientY);
+    zoomAt(x, y, Math.exp(-clampN(dy, -200, 200) * (e.ctrlKey ? 0.01 : 0.0022)));
+  }, { passive: false });
+  map.addEventListener("dblclick", (e) => { if (!V) return; e.preventDefault(); const [x, y] = local(e.clientX, e.clientY); zoomAt(x, y, e.shiftKey ? 1 / 2 : 2); });
+  map.addEventListener("pointerdown", (e) => {
+    if (!V) return;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.size === 1) moved = 0;
+    if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 };
+    }
+    if (e.pointerType === "mouse" || !view.follow || pointers.size === 2) { try { map.setPointerCapture(e.pointerId); } catch (err) {} }
+  });
+  map.addEventListener("pointermove", (e) => {
+    const p = pointers.get(e.pointerId);
+    if (!p) return;
+    const dx = e.clientX - p.x, dy = e.clientY - p.y;
+    p.x = e.clientX; p.y = e.clientY;
+    if (pointers.size >= 2 && pinch) {
+      const [a, b] = [...pointers.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y) || 1, mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+      const [lx, ly] = local(mx, my);
+      zoomAt(lx, ly, d / pinch.d);
+      panBy(mx - pinch.mx, my - pinch.my);
+      pinch = { d, mx, my }; moved = 99;
+      return;
+    }
+    const dragging = e.pointerType === "mouse" ? (e.buttons & 1) === 1 : !view.follow;
+    if (!dragging) return;
+    moved += Math.abs(dx) + Math.abs(dy);
+    if (moved > 4) panBy(dx, dy);
+  });
+  const lift = (e) => { pointers.delete(e.pointerId); if (pointers.size < 2) pinch = null; };
+  ["pointerup", "pointercancel"].forEach((ev) => map.addEventListener(ev, lift));
+  document.addEventListener("keydown", (e) => {
+    if (!V || !map.matches(":hover") || e.target.closest("input, select, textarea")) return;
+    if (e.key === "+" || e.key === "=") zoomAt(...anchorPt(), 1.4);
+    else if (e.key === "-" || e.key === "_") zoomAt(...anchorPt(), 1 / 1.4);
+    else if (e.key === "0") resetView();
+  });
+  // A venue screen drifts back to the full beam view a minute and a half after someone stops touching it
+  if (KIOSK) setInterval(() => { if (!view.follow && Date.now() - lastInteract > 90000) resetView(); }, 5000);
+
   // ---------- Tap a plane to see what it is ----------
   let selected = null;
   const CLASS = { pluck: "Small aircraft", bell: "Airliner", heavy: "Heavy", rotor: "Helicopter", glass: "Other" };
@@ -1512,10 +1626,10 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     $("card").hidden = false;
   }
   map.addEventListener("click", (e) => {
-    if (!V) return;
+    if (!V || moved > 6) return;
     const rect = map.getBoundingClientRect();
     const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-    const scale = V.rPx / R;
+    const scale = V.k;
     let best = null, bestD = 24;
     for (const v of visible) {
       const x = V.cx + v.r.dx * scale, y = V.cy - v.r.dy * scale;
