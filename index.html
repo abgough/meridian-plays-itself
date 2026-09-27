@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F1B2D">
 <title>Sky Sweep</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -146,6 +151,61 @@
 
   footer { font-size: 13px; color: var(--muted); max-width: 76ch; border-top: 1px solid var(--rule); padding-top: 14px; }
   footer p { margin: 0 0 6px; }
+
+  /* Take it with you */
+  .fld > .btn { justify-self: start; }
+  .btn[aria-pressed="true"] { background: var(--beam); color: var(--bg); border-color: var(--beam); }
+  .btn:disabled { opacity: 0.45; cursor: default; }
+  .thanks { grid-column: 1 / -1; margin: 0; font-size: 14px; color: var(--ink); background: var(--panel-2); border-radius: 6px; padding: 10px 12px; }
+  .thanks a, .tipline a { color: var(--beam); }
+  .tipline[hidden], .thanks[hidden] { display: none; }
+  .sheet { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(8, 14, 24, 0.82); }
+  .sheet[hidden] { display: none; }
+  .sheet-card { display: grid; gap: 12px; justify-items: center; max-width: min(520px, 100%); max-height: 100%; overflow-y: auto; background: var(--panel); border-radius: 12px; padding: 16px; }
+  .sheet-card img { width: 100%; max-height: 64vh; object-fit: contain; border-radius: 4px; background: var(--bg); }
+  .sheet-row { display: flex; gap: 10px; align-items: center; }
+  .sheet-card .pick-btn { text-decoration: none; }
+  .sheet-card .note-s { margin: 0; font-size: 12px; color: var(--muted); text-align: center; }
+
+  /* Venue display (?kiosk=1) */
+  body.kiosk-on { overflow: hidden; }
+  body.kiosk-on > .wrap { display: none; }
+  .kiosk { position: fixed; inset: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); background: var(--bg); overflow: hidden; }
+  .kiosk[hidden] { display: none; }
+  .k-map { height: 100vh; height: 100dvh; width: min(100vh, 62vw); width: min(100dvh, 62vw); display: grid; place-items: center; padding: 2.4vmin; box-sizing: border-box; }
+  .k-map .mapwrap { width: 100%; }
+  .k-map .play, .k-map .card-link { display: none; }
+  .k-side { display: flex; flex-direction: column; gap: 2.4vmin; padding: 5vmin 5vmin 3.5vmin 2vmin; min-width: 0; }
+  .k-eyebrow { margin: 0; font-family: var(--mono); font-size: max(12px, 1.8vmin); letter-spacing: 0.14em; text-transform: uppercase; color: var(--beam); }
+  .k-eyebrow span { color: var(--live); margin-left: 1ch; }
+  .k-title { margin: 0; font-family: var(--display); font-weight: 800; font-size: max(34px, 8.4vmin); line-height: 0.9; text-transform: uppercase; text-wrap: balance; }
+  .k-sub { margin: 0; max-width: 44ch; font-size: max(15px, 2.4vmin); color: var(--muted); }
+  .k-now { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3vmin; align-items: center; background: var(--panel); border-radius: 1.6vmin; padding: 2.6vmin 3vmin; }
+  .k-note { min-width: 1.5em; font-family: var(--display); font-weight: 800; font-size: max(44px, 11vmin); line-height: 1; text-align: center; font-variant-numeric: tabular-nums; }
+  .k-note.low { color: var(--low); } .k-note.mid { color: var(--mid); } .k-note.high { color: var(--high); }
+  .k-who { display: grid; gap: 0.6vmin; min-width: 0; }
+  .k-cs { font-family: var(--mono); font-weight: 500; font-size: max(18px, 3.4vmin); }
+  .k-type { font-size: max(16px, 3vmin); line-height: 1.2; }
+  .k-meta { font-size: max(13px, 2.2vmin); color: var(--muted); }
+  .k-tip { margin: 0; max-width: 46ch; min-height: 2.6em; font-size: max(16px, 2.7vmin); line-height: 1.3; transition: opacity 0.6s; }
+  .k-legend { display: flex; flex-wrap: wrap; gap: 1vmin 3vmin; font-size: max(12px, 1.8vmin); color: var(--muted); }
+  .k-legend span { display: inline-flex; align-items: center; gap: 1vmin; }
+  .k-legend .sw { width: 1.6vmin; height: 1.6vmin; min-width: 10px; min-height: 10px; }
+  .k-foot { margin-top: auto; display: flex; flex-wrap: wrap; gap: 2vmin 4vmin; align-items: flex-end; justify-content: space-between; }
+  .k-qr { display: flex; gap: 2vmin; align-items: center; }
+  .k-qr > div { width: max(84px, 14vmin); height: max(84px, 14vmin); padding: 1vmin; background: #fff; border-radius: 1vmin; box-sizing: border-box; }
+  .k-qr > div:empty { display: none; }
+  .k-qr svg, .k-qr img { width: 100%; height: 100%; display: block; }
+  .k-qr p { margin: 0; font-size: max(13px, 2.1vmin); line-height: 1.35; }
+  .k-credit { margin: 0; font-size: max(11px, 1.5vmin); color: var(--muted); }
+  .k-start { position: absolute; inset: 0; border: 0; background: rgba(15, 27, 45, 0.72); color: var(--ink); font-family: var(--display); font-weight: 600; font-size: max(26px, 6vmin); letter-spacing: 0.05em; text-transform: uppercase; }
+  .k-start[hidden] { display: none; }
+  body.kiosk-idle, body.kiosk-idle * { cursor: none !important; }
+  @media (orientation: portrait) {
+    .kiosk { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; overflow-y: auto; align-content: start; }
+    .k-map { width: min(100vw, 58vh); height: auto; justify-self: center; }
+    .k-side { padding: 1vmin 5vmin 5vmin; }
+  }
 </style>
 
 <div class="wrap">
@@ -278,6 +338,34 @@
           <div class="tune-foot"><button class="btn" type="button" id="resetTune">Back to defaults</button></div>
         </div>
       </details>
+
+      <details class="tune" id="keep">
+        <summary><h2>Take it with you</h2><span class="tune-sum">Record · MIDI · Poster</span></summary>
+        <div class="tune-body">
+          <div class="fld">
+            <span class="lab">Record the sound <output id="recOut"></output></span>
+            <button class="btn" type="button" id="recBtn">Start recording</button>
+            <p class="note-s">Saves what you hear as an audio file, up to 20 minutes.</p>
+          </div>
+          <div class="fld">
+            <span class="lab">Poster</span>
+            <button class="btn" type="button" id="posterBtn">Make a poster of this sky</button>
+            <p class="note-s">Every flight path the beam has seen since you got here, drawn as a print-ready image. The longer you listen, the fuller it gets.</p>
+          </div>
+          <div class="fld">
+            <span class="lab">MIDI <output id="midiCount"></output></span>
+            <button class="btn" type="button" id="midiSave">Save the last 10 minutes as MIDI</button>
+            <p class="note-s">Every note on its own instrument track, ready for GarageBand, Logic, Ableton, or any music app.</p>
+          </div>
+          <div class="fld" id="midiLiveFld" hidden>
+            <label for="midiOut">Play live on a MIDI instrument</label>
+            <button class="btn" type="button" id="midiConnect">Find MIDI instruments</button>
+            <select id="midiOut" hidden><option value="">Off</option></select>
+            <p class="note-s">Sends each note as it plays: bells on channel 1, plucks 2, big jets 3, helicopters 4, others 5, the chord pad 6.</p>
+          </div>
+          <p class="thanks" id="thanks" hidden></p>
+        </div>
+      </details>
     </section>
     <aside class="side" aria-label="Notes played">
       <div class="side-head"><h2>Notes</h2><span class="count"><span id="count">0</span> this session · <span id="rate">0</span>/min</span></div>
@@ -310,7 +398,44 @@
   <footer>
     <p>Aircraft positions come from adsb.lol, a community network of volunteer ADS-B receivers. The page asks for everything within about 290 miles of your rough area every 15 seconds, and everyone listening to the same area shares that answer. The page plays it back 45 seconds behind real time, which lets it place each plane between two known positions.</p>
     <p>Receivers sit on land, so over open ocean or very remote areas the beam can come up short. Place search by Photon and OpenStreetMap. Times in the list are the real moments the beam reached each plane, in your local time. Nothing is pre-recorded.</p>
+    <p>Aircraft data © adsb.lol contributors, available under the <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener" style="color:inherit">Open Database License</a>.</p>
+    <p class="tipline" id="tipLine" hidden>Sky Sweep is free, with no ads and no accounts. If it made your day, you can <a class="tiplink" href="#" target="_blank" rel="noopener">chip in for the servers</a>.</p>
   </footer>
+</div>
+
+<div class="kiosk" id="kiosk" hidden>
+  <div class="k-map" id="kMap"></div>
+  <aside class="k-side">
+    <p class="k-eyebrow">Sky Sweep <span id="kLive"></span></p>
+    <h1 class="k-title" id="kWhere">The sky above us</h1>
+    <p class="k-sub">A radar beam sweeps the sky, and every plane it passes plays a note. Live, 45 seconds behind real time.</p>
+    <div class="k-now" id="kNow">
+      <span class="k-note" id="kNote">·</span>
+      <div class="k-who"><b class="k-cs" id="kCs">Listening…</b><span class="k-type" id="kType">The next plane the beam reaches will show up here.</span><span class="k-meta" id="kMeta"></span></div>
+    </div>
+    <p class="k-tip" id="kTip"></p>
+    <div class="k-legend">
+      <span><i class="sw" style="background:var(--low)"></i>Below 10,000 ft</span>
+      <span><i class="sw" style="background:var(--mid)"></i>10,000–25,000 ft</span>
+      <span><i class="sw" style="background:var(--high)"></i>Above 25,000 ft</span>
+    </div>
+    <div class="k-foot">
+      <div class="k-qr"><div id="kQr" aria-hidden="true"></div><p><b>Hear it on your phone</b><br>Scan to take the sky with you.</p></div>
+      <p class="k-credit">Aircraft data © adsb.lol contributors (ODbL)</p>
+    </div>
+  </aside>
+  <button class="k-start" id="kStart" type="button" hidden>Tap anywhere to start the sound</button>
+</div>
+
+<div class="sheet" id="posterSheet" hidden role="dialog" aria-modal="true" aria-label="Your poster">
+  <div class="sheet-card">
+    <img id="posterImg" alt="Poster of the flight paths heard in this session">
+    <div class="sheet-row">
+      <a class="pick-btn" id="posterDl" href="#" download>Download</a>
+      <button class="btn" type="button" id="posterClose">Close</button>
+    </div>
+    <p class="note-s" id="posterNote">3000 × 4000 pixels, sharp enough to print at 12 × 16 inches. On a phone, press and hold the picture to save it to Photos.</p>
+  </div>
 </div>
 
 <script>
@@ -329,6 +454,8 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   const NOTES_PER_SEC = 1;       // target tempo: 60 notes a minute
   const P_MIN = 8, P_MAX = 40;   // seconds per sweep
   const SCORE_WINDOW_MS = 60000;
+  const TIP_URL = "";            // pay-what-you-want link; the tip jar stays hidden while this is empty
+  const KIOSK = new URLSearchParams(location.search).has("kiosk");
 
   const $ = (id) => document.getElementById(id);
   const css = getComputedStyle(document.documentElement);
@@ -442,6 +569,28 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     if (cat === "A7") return "rotor";
     return "glass";
   }
+  // Plain names for the most common aircraft type codes
+  const TYPE_NAMES = {
+    A19N: "Airbus A319neo", A20N: "Airbus A320neo", A21N: "Airbus A321neo", A318: "Airbus A318", A319: "Airbus A319", A320: "Airbus A320", A321: "Airbus A321",
+    A332: "Airbus A330", A333: "Airbus A330", A339: "Airbus A330neo", A343: "Airbus A340", A359: "Airbus A350", A35K: "Airbus A350-1000", A388: "Airbus A380",
+    BCS1: "Airbus A220", BCS3: "Airbus A220", B712: "Boeing 717", B737: "Boeing 737", B738: "Boeing 737", B739: "Boeing 737", B38M: "Boeing 737 MAX", B39M: "Boeing 737 MAX", B3XM: "Boeing 737 MAX",
+    B744: "Boeing 747", B748: "Boeing 747-8", B74F: "Boeing 747 freighter", B752: "Boeing 757", B753: "Boeing 757", B762: "Boeing 767", B763: "Boeing 767", B764: "Boeing 767",
+    B772: "Boeing 777", B77L: "Boeing 777", B77W: "Boeing 777", B778: "Boeing 777X", B788: "Boeing 787 Dreamliner", B789: "Boeing 787 Dreamliner", B78X: "Boeing 787 Dreamliner", MD11: "McDonnell Douglas MD-11",
+    E135: "Embraer 135", E145: "Embraer 145", E170: "Embraer 170", E75L: "Embraer 175", E75S: "Embraer 175", E190: "Embraer 190", E290: "Embraer E2", E195: "Embraer 195",
+    CRJ2: "Bombardier CRJ", CRJ7: "Bombardier CRJ", CRJ9: "Bombardier CRJ", CRJX: "Bombardier CRJ", DH8D: "Dash 8 turboprop", AT76: "ATR 72 turboprop", AT75: "ATR 72 turboprop",
+    C150: "Cessna 150", C152: "Cessna 152", C172: "Cessna 172 Skyhawk", C182: "Cessna 182", C206: "Cessna 206", C208: "Cessna Caravan", C210: "Cessna 210", P28A: "Piper Cherokee", PA28: "Piper Cherokee",
+    P28R: "Piper Arrow", PA32: "Piper Saratoga", PA44: "Piper Seminole", PA46: "Piper Malibu", SR20: "Cirrus SR20", SR22: "Cirrus SR22", SF50: "Cirrus Vision Jet", BE35: "Beechcraft Bonanza",
+    BE36: "Beechcraft Bonanza", BE58: "Beechcraft Baron", BE20: "Beechcraft King Air", BE9L: "Beechcraft King Air", B350: "Beechcraft King Air", PC12: "Pilatus PC-12", PC24: "Pilatus PC-24", TBM9: "Daher TBM",
+    TBM7: "Daher TBM", DA40: "Diamond DA40", DA42: "Diamond DA42", M20P: "Mooney", C25A: "Cessna Citation", C25B: "Cessna Citation", C25C: "Cessna Citation", C510: "Cessna Citation Mustang",
+    C525: "Cessna Citation", C550: "Cessna Citation", C560: "Cessna Citation", C56X: "Cessna Citation Excel", C680: "Cessna Citation Sovereign", C68A: "Cessna Citation Latitude", C700: "Cessna Citation Longitude",
+    E55P: "Embraer Phenom 300", E50P: "Embraer Phenom 100", E545: "Embraer Legacy", CL30: "Bombardier Challenger", CL35: "Bombardier Challenger", CL60: "Bombardier Challenger", GL5T: "Bombardier Global",
+    GLEX: "Bombardier Global", GL7T: "Bombardier Global 7500", LJ45: "Learjet 45", LJ75: "Learjet 75", GLF4: "Gulfstream IV", GLF5: "Gulfstream V", GLF6: "Gulfstream G650", G280: "Gulfstream G280",
+    FA50: "Dassault Falcon", FA7X: "Dassault Falcon 7X", F2TH: "Dassault Falcon 2000", HDJT: "HondaJet", B407: "Bell 407 helicopter", B06: "Bell JetRanger helicopter", B429: "Bell 429 helicopter",
+    EC35: "Airbus H135 helicopter", EC45: "Airbus H145 helicopter", AS50: "Airbus H125 helicopter", EC30: "Airbus H130 helicopter", R44: "Robinson R44 helicopter", R22: "Robinson R22 helicopter",
+    S76: "Sikorsky S-76 helicopter", H60: "Black Hawk helicopter", A139: "Leonardo AW139 helicopter", C130: "C-130 Hercules", C30J: "C-130J Hercules", C17: "C-17 Globemaster", K35R: "KC-135 tanker",
+    KC46: "KC-46 tanker", C5M: "C-5 Galaxy", F16: "F-16 fighter", F35: "F-35 fighter", F18S: "F/A-18 fighter", T38: "T-38 trainer", GLID: "Glider", BALL: "Balloon",
+  };
+  const typeName = (code) => TYPE_NAMES[code] || "";
   const durationFor = (gs) => (gs == null ? 0.8 : Math.max(0.25, Math.min(2.5, 0.25 + ((gs - 80) / 520) * 2.25)));
   const NAMES = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
@@ -542,7 +691,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     const prev = theta;
     theta = (theta + (TAU * dt) / P) % TAU;
     const quad = Math.floor(theta / (TAU / 4));
-    if (quad !== Math.floor(prev / (TAU / 4))) { chordIx++; buildChord(); updatePad(); }
+    if (quad !== Math.floor(prev / (TAU / 4))) { chordIx++; buildChord(); updatePad(); keepChord(); }
     const crossed = (b) => (prev <= theta ? b > prev && b <= theta : b > prev || b <= theta);
     for (const v of visible) {
       if (v.p.ground || v.p.alt == null || v.r.d > R) continue;
@@ -595,6 +744,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     a.flash = now; a.flashName = name; a.flashBand = band;
     events.push({ t: now, midi: m, band, inst });
     addLog({ a, p, r, name, band, inst, t: now - DELAY_MS });
+    keepNote({ a, p, r, m, name, band, inst, note, motion, now });
   }
 
   // ---------- Log ----------
@@ -617,7 +767,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     b.textContent = a.cs;
     const kind = document.createElement("span");
     kind.className = "kind";
-    kind.textContent = [a.type, INST_LABEL[inst]].filter(Boolean).join(" · ");
+    kind.textContent = [typeName(a.type) || a.type, INST_LABEL[inst]].filter(Boolean).join(" · ");
     const meta = document.createElement("span");
     meta.className = "meta";
     const mv = a.motion > 0 ? "coming closer" : a.motion < 0 ? "heading away" : null;
@@ -783,9 +933,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     if (!A || !soundOn || !S.pad || S.style !== "composed" || !chord) { stopPad(); return; }
     stopPad();
     const ctx = A.ctx, t = ctx.currentTime;
-    const root = 60 + chord.pcs[0];
-    const up = (pc) => root + ((pc - chord.pcs[0] + 12) % 12);
-    const notes = [root, up(chord.pcs[2]), up(chord.pcs[1]) + 12];
+    const notes = padNotes(60);
     const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.013, t + 2.4);
     const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1400;
     g.connect(lp); lp.connect(A.dry);
@@ -975,6 +1123,8 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     const n = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
     return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
   }
+  // Bigger map lettering on a venue screen, so it reads from across a room
+  const labelScale = () => (KIOSK ? Math.max(1, Math.min(1.9, Math.min(MW, MH) / 560)) : 1);
   const bandColor = (b) => (b === "low" ? C.low : b === "mid" ? C.mid : C.high);
 
   function pathOf(g, pts, close) {
@@ -1035,12 +1185,13 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     g.setLineDash([]);
     g.strokeStyle = alpha(C.beam, 0.55); g.lineWidth = 1.5;
     g.beginPath(); g.arc(V.cx, V.cy, V.rPx, 0, TAU); g.stroke();
-    g.font = `10px ${fonts.mono}`; g.fillStyle = alpha(C.staff, 0.55); g.textAlign = "left"; g.textBaseline = "middle";
+    const fs = labelScale();
+    g.font = `${10 * fs}px ${fonts.mono}`; g.fillStyle = alpha(C.staff, 0.55); g.textAlign = "left"; g.textBaseline = "middle";
     for (const f of [1 / 3, 2 / 3, 1]) g.fillText(Math.round(R * f) + " mi", V.cx + V.rPx * f * 0.7071 + 4, V.cy - V.rPx * f * 0.7071 - 4);
     // compass points
     g.fillStyle = alpha(C.staff, 0.5); g.textAlign = "center";
-    g.fillText("N", V.cx, V.cy - V.rPx - 10); g.fillText("S", V.cx, V.cy + V.rPx + 10);
-    g.fillText("E", V.cx + V.rPx + 10, V.cy); g.fillText("W", V.cx - V.rPx - 10, V.cy);
+    g.fillText("N", V.cx, V.cy - V.rPx - 10 * fs); g.fillText("S", V.cx, V.cy + V.rPx + 10 * fs);
+    g.fillText("E", V.cx + V.rPx + 10 * fs, V.cy); g.fillText("W", V.cx - V.rPx - 10 * fs, V.cy);
   }
 
   function drawMap(now) {
@@ -1052,6 +1203,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     const { cx, cy, rPx } = V;
     const scale = rPx / R; // px per mile
+    const fs = labelScale();
 
     // the beam with a fading trail behind it
     const slices = 16, trail = rad(50);
@@ -1072,7 +1224,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
       if (x < -10 || x > MW + 10 || y < -10 || y > MH + 10) continue;
       const inside = r.d <= R && !p.ground && p.alt != null;
       const col = p.ground || p.alt == null ? C.muted : bandColor(altBand(p.alt));
-      const sz = 5;
+      const sz = 5 * fs;
       const tr = rad(p.trk || 0), sn = Math.sin(tr), cs = Math.cos(tr);
       const pt = (dx, dy) => [x + dx * cs - dy * sn, y + dx * sn + dy * cs];
       const [ax, ay] = pt(0, -sz), [bx, by] = pt(sz * 0.7, sz * 0.85), [ccx, ccy] = pt(0, sz * 0.5), [dx, dy] = pt(-sz * 0.7, sz * 0.85);
@@ -1082,21 +1234,21 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
       g.globalAlpha = 1;
       if (a.hex === selected) {
         g.strokeStyle = C.ink; g.lineWidth = 2;
-        g.beginPath(); g.arc(x, y, 12, 0, TAU); g.stroke();
+        g.beginPath(); g.arc(x, y, 12 * fs, 0, TAU); g.stroke();
       }
       if (S.labels && inside && !(a.flash && now - a.flash < 2600)) {
-        g.font = `10px ${fonts.mono}`; g.textAlign = "left"; g.textBaseline = "middle";
-        g.fillStyle = alpha(C.ink, 0.7); g.fillText(a.cs, x + 8, y);
+        g.font = `${10 * fs}px ${fonts.mono}`; g.textAlign = "left"; g.textBaseline = "middle";
+        g.fillStyle = alpha(C.ink, 0.7); g.fillText(a.cs, x + 8 * fs, y);
       }
       if (a.flash && now - a.flash < 2600) {
         const age = (now - a.flash) / 2600;
         const fc = bandColor(a.flashBand);
         g.strokeStyle = alpha(fc, 1 - age); g.lineWidth = 2;
-        g.beginPath(); g.arc(x, y, 6 + age * 22, 0, TAU); g.stroke();
-        g.fillStyle = alpha(fc, 1 - age); g.font = `800 17px ${fonts.display}`; g.textAlign = "left"; g.textBaseline = "alphabetic";
-        g.fillText(a.flashName, x + 10, y - 8);
-        g.fillStyle = alpha(C.ink, 0.9 * (1 - age)); g.font = `10px ${fonts.mono}`;
-        g.fillText(a.cs, x + 10, y + 12);
+        g.beginPath(); g.arc(x, y, (6 + age * 22) * fs, 0, TAU); g.stroke();
+        g.fillStyle = alpha(fc, 1 - age); g.font = `800 ${17 * fs}px ${fonts.display}`; g.textAlign = "left"; g.textBaseline = "alphabetic";
+        g.fillText(a.flashName, x + 10 * fs, y - 8 * fs);
+        g.fillStyle = alpha(C.ink, 0.9 * (1 - age)); g.font = `${10 * fs}px ${fonts.mono}`;
+        g.fillText(a.cs, x + 10 * fs, y + 12 * fs);
       }
     }
     // center: a pulsing marker and a label so it's clear where the radar is listening from
@@ -1107,9 +1259,9 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
       g.fillStyle = C.beam; g.beginPath(); g.arc(cx, cy, 5, 0, TAU); g.fill();
       g.strokeStyle = C.ink; g.lineWidth = 1.5; g.beginPath(); g.arc(cx, cy, 9, 0, TAU); g.stroke();
       const label = center.kind === "you" ? "YOU" : (center.name || "").split(",")[0].toUpperCase();
-      g.font = `600 14px ${fonts.display}`; g.textAlign = "center"; g.textBaseline = "top";
-      g.lineWidth = 4; g.strokeStyle = alpha(C.bg, 0.85); g.strokeText(label, cx, cy + 15);
-      g.fillStyle = C.ink; g.fillText(label, cx, cy + 15);
+      g.font = `600 ${14 * fs}px ${fonts.display}`; g.textAlign = "center"; g.textBaseline = "top";
+      g.lineWidth = 4; g.strokeStyle = alpha(C.bg, 0.85); g.strokeText(label, cx, cy + 15 * fs);
+      g.fillStyle = C.ink; g.fillText(label, cx, cy + 15 * fs);
       if (center.kind === "you" && center.town) {
         g.font = `10px ${fonts.mono}`;
         g.strokeText(center.town, cx, cy + 32); g.fillStyle = alpha(C.ink, 0.75); g.fillText(center.town, cx, cy + 32);
@@ -1188,6 +1340,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     $("where").textContent = hasCenter() ? center.name : "No place chosen yet";
     $("pick").hidden = hasCenter();
     updatePlay();
+    if (KIOSK) { $("kWhere").textContent = kioskTitle(); kioskQr(); }
   }
   function showPickError(text) {
     if (hasCenter()) return;
@@ -1200,6 +1353,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     center.lat = lat; center.lon = lon; center.name = name; center.kind = kind || "place"; center.town = "";
     renderWhere();
     ac.clear(); events.length = 0; selected = null; $("card").hidden = true;
+    resetSession();
     R = Rtarget = S.reachMode === "set" ? Number(S.reach) : 150; P = Ptarget = 20;
     if (mode === "sample") sim.seed();
     drawLayer();
@@ -1341,7 +1495,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     if (!v) { $("card").hidden = true; selected = null; return; }
     const { a, p, r } = v;
     $("cardCs").textContent = a.cs;
-    $("cardKind").textContent = [a.type, CLASS[instrumentFor(a.cat)]].filter(Boolean).join(" · ");
+    $("cardKind").textContent = [typeName(a.type) ? `${typeName(a.type)} (${a.type})` : a.type, CLASS[instrumentFor(a.cat)]].filter(Boolean).join(" · ");
     const rows = [
       ["Altitude", p.ground ? "On the ground" : p.alt != null ? `${Math.round(p.alt).toLocaleString()} ft` : "Unknown"],
       ["Speed", p.gs != null ? `${Math.round(p.gs)} kt (${Math.round(p.gs * 1.15078)} mph)` : "Unknown"],
@@ -1373,6 +1527,435 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   });
   $("cardClose").addEventListener("click", () => { selected = null; $("card").hidden = true; });
   setInterval(() => { if (selected) fillCard(); }, 700);
+
+  // ---------- Take it with you: session memory for the poster, MIDI, recording, and the venue display ----------
+  const session = { start: 0, trails: new Map(), hits: [], planes: new Set(), notes: 0, points: 0, maxR: 0, sample: false };
+  const midiLog = [], chordLog = [];
+  const MIDI_KEEP_MS = 12 * 60000, MIDI_SAVE_MS = 10 * 60000, MAX_POINTS = 150000;
+  const CH = { bell: 0, pluck: 1, heavy: 2, rotor: 3, glass: 4, pad: 5 };
+  function resetSession() {
+    session.start = 0; session.trails.clear(); session.hits.length = 0; session.planes.clear();
+    session.notes = 0; session.points = 0; session.maxR = 0; session.sample = false;
+    midiLog.length = 0; chordLog.length = 0; renderMidiCount();
+  }
+  function keepNote({ a, p, r, m, name, band, inst, note, motion, now }) {
+    if (!session.start) session.start = now;
+    if (mode === "sample") session.sample = true;
+    session.hits.push([r.dx, r.dy, band]); session.notes++; session.planes.add(a.hex);
+    const ch = CH[inst] ?? 4;
+    const vel = Math.max(24, Math.min(127, Math.round(36 + 91 * Math.min(1, note.vel || 0.8))));
+    midiLog.push({ t: now, m, vel, dur: note.dur || 0.6, ch });
+    while (midiLog.length && now - midiLog[0].t > MIDI_KEEP_MS) midiLog.shift();
+    midiLive(m, vel, note.dur || 0.6, ch);
+    renderMidiCount();
+    if (KIOSK) kioskNote({ a, p, r, name, band, motion });
+  }
+  function padNotes(base = 60) {
+    const root = base + chord.pcs[0];
+    const up = (pc) => root + ((pc - chord.pcs[0] + 12) % 12);
+    return [root, up(chord.pcs[2]), up(chord.pcs[1]) + 12];
+  }
+  function keepChord() {
+    if (S.style !== "composed" || !S.pad || !chord) return;
+    const ns = padNotes(48);
+    chordLog.push({ t: Date.now(), notes: ns });
+    while (chordLog.length && Date.now() - chordLog[0].t > MIDI_KEEP_MS) chordLog.shift();
+    midiPad(ns);
+  }
+  // Every few seconds, remember where each plane in the circle is, for the poster
+  setInterval(() => {
+    if (!hasCenter() || mode === "connecting" || !visible.length || session.points > MAX_POINTS) return;
+    if (!session.start) session.start = Date.now();
+    session.maxR = Math.max(session.maxR, R);
+    for (const v of visible) {
+      if (v.p.ground || v.p.alt == null || v.r.d > R * 1.2) continue;
+      let t = session.trails.get(v.a.hex);
+      if (!t) { t = []; session.trails.set(v.a.hex, t); }
+      const last = t[t.length - 1];
+      if (last) {
+        const jump = Math.hypot(last[0] - v.r.dx, last[1] - v.r.dy);
+        if (jump < 0.6) continue;
+        if (jump > 25) t.push(null); // a gap in coverage: don't draw a line across it
+      }
+      t.push([Math.round(v.r.dx * 100) / 100, Math.round(v.r.dy * 100) / 100, v.p.alt]);
+      session.points++;
+    }
+  }, 3000);
+
+  function saveBlob(blob, name) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = name; a.rel = "noopener";
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+  }
+  function placeLabel() {
+    if (!hasCenter()) return "The sky";
+    if (center.kind === "you") return center.town || "The sky above me";
+    return center.name || "The sky";
+  }
+  function fileStem() {
+    const d = new Date(), pad = (n) => String(n).padStart(2, "0");
+    const slug = placeLabel().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "sky";
+    return `sky-sweep-${slug}-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+  function showThanks(msg) {
+    const el = $("thanks");
+    el.textContent = msg;
+    if (TIP_URL) {
+      el.append(" Sky Sweep is free, with no ads. If you'd like to help keep it that way, ");
+      const a = document.createElement("a"); a.href = TIP_URL; a.target = "_blank"; a.rel = "noopener"; a.textContent = "chip in for the servers";
+      el.append(a, ".");
+    }
+    el.hidden = false;
+  }
+  if (TIP_URL) { document.querySelectorAll(".tiplink").forEach((a) => (a.href = TIP_URL)); $("tipLine").hidden = false; }
+
+  // Record what you hear
+  let rec = null;
+  const REC_MAX_MS = 20 * 60000;
+  const fmtDur = (ms) => { const s = Math.floor(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+  if (!window.MediaRecorder) { $("recBtn").disabled = true; $("recOut").textContent = "Not supported in this browser"; }
+  async function startRec() {
+    if (!soundOn) await toggleSound();
+    if (!A || !soundOn) return;
+    const types = ["audio/mp4;codecs=mp4a.40.2", "audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg;codecs=opus"];
+    const type = types.find((t) => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || "";
+    const dest = A.ctx.createMediaStreamDestination();
+    A.out.connect(dest);
+    let mr;
+    try { mr = new MediaRecorder(dest.stream, type ? { mimeType: type, audioBitsPerSecond: 192000 } : undefined); }
+    catch (e) { A.out.disconnect(dest); $("recOut").textContent = "Couldn't start recording"; return; }
+    const chunks = [];
+    mr.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+    mr.onstop = () => {
+      try { A.out.disconnect(dest); } catch (e) {}
+      const mime = (mr.mimeType || type || "audio/webm").split(";")[0];
+      const ext = mime.includes("mp4") ? "m4a" : mime.includes("ogg") ? "ogg" : "webm";
+      const blob = new Blob(chunks, { type: mime });
+      if (blob.size) { saveBlob(blob, `${fileStem()}.${ext}`); showThanks(`Saved ${fmtDur(Date.now() - rec.start)} of the sky as an audio file.`); }
+      clearInterval(rec.tick); rec = null;
+      $("recBtn").textContent = "Start recording"; $("recBtn").setAttribute("aria-pressed", "false"); $("recOut").textContent = "";
+    };
+    mr.start(1000);
+    rec = { mr, start: Date.now(), tick: setInterval(() => {
+      const el = Date.now() - rec.start;
+      $("recOut").textContent = `● ${fmtDur(el)}`;
+      if (el >= REC_MAX_MS) stopRec();
+    }, 500) };
+    $("recBtn").textContent = "Stop and save"; $("recBtn").setAttribute("aria-pressed", "true"); $("recOut").textContent = "● 0:00";
+  }
+  function stopRec() { if (rec && rec.mr.state !== "inactive") rec.mr.stop(); }
+  $("recBtn").addEventListener("click", () => (rec ? stopRec() : startRec()));
+
+  // MIDI: a Standard MIDI File of the last ten minutes, one track per instrument
+  const GM = { 0: 11, 1: 46, 2: 48, 3: 115, 4: 98, 5: 89 }; // vibraphone, harp, strings, woodblock, crystal, warm pad
+  const TRACK_NAMES = { 0: "Airliners (bells)", 1: "Small planes (plucks)", 2: "Big jets (bass)", 3: "Helicopters (taps)", 4: "Other aircraft (glass)", 5: "Chord pad" };
+  function renderMidiCount() {
+    const n = midiLog.filter((x) => Date.now() - x.t <= MIDI_SAVE_MS).length;
+    $("midiCount").textContent = n ? `${n.toLocaleString()} notes ready` : "";
+  }
+  function vlq(n) { const b = [n & 0x7f]; while ((n >>= 7)) b.unshift((n & 0x7f) | 0x80); return b; }
+  const u32 = (n) => [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255];
+  const txt = (s) => Array.from(new TextEncoder().encode(s));
+  function chunk(id, bytes) { return [...txt(id), ...u32(bytes.length), ...bytes]; }
+  function trackBytes(evs) {
+    evs.sort((x, y) => x[0] - y[0] || x[2] - y[2]);
+    const out = []; let last = 0;
+    for (const [tick, bytes] of evs) { out.push(...vlq(tick - last), ...bytes); last = tick; }
+    out.push(0, 0xff, 0x2f, 0);
+    return chunk("MTrk", out);
+  }
+  function buildMidi() {
+    const now = Date.now();
+    const ns = midiLog.filter((x) => now - x.t <= MIDI_SAVE_MS);
+    if (!ns.length) return null;
+    const t0 = ns[0].t;
+    const beat = S.timing === "beat";
+    const bpm = beat ? Number(S.bpm) : 120, PPQ = 480;
+    const tk = (ms) => Math.max(0, Math.round(((ms - t0) / 1000) * (bpm / 60) * PPQ));
+    const q = beat ? PPQ / 2 : 1, snap = (x) => Math.round(x / q) * q;
+    const byCh = new Map();
+    const push = (ch, e) => { if (!byCh.has(ch)) byCh.set(ch, []); byCh.get(ch).push(e); };
+    let end = 0;
+    for (const n of ns) {
+      const on = snap(tk(n.t)), off = on + Math.max(beat ? q : 90, Math.round(n.dur * (bpm / 60) * PPQ));
+      push(n.ch, [on, [0x90 | n.ch, n.m, n.vel], 1]); push(n.ch, [off, [0x80 | n.ch, n.m, 0], 0]);
+      end = Math.max(end, off);
+    }
+    const cs = chordLog.filter((c) => c.t <= now);
+    for (let i = 0; i < cs.length; i++) {
+      const on = Math.max(0, tk(cs[i].t)), off = i + 1 < cs.length ? tk(cs[i + 1].t) : end;
+      if (off <= 0 || off <= on) continue;
+      for (const m of cs[i].notes) { push(5, [on, [0x95, m, 44], 1]); push(5, [off, [0x85, m, 0], 0]); }
+    }
+    const us = Math.round(60000000 / bpm);
+    const head = [[0, [0xff, 0x03, ...vlq(txt("Sky Sweep").length), ...txt("Sky Sweep")], 0], [0, [0xff, 0x51, 0x03, (us >> 16) & 255, (us >> 8) & 255, us & 255], 0], [0, [0xff, 0x58, 0x04, 4, 2, 24, 8], 0]];
+    const tracks = [trackBytes(head)];
+    for (const ch of [...byCh.keys()].sort()) {
+      const name = txt(TRACK_NAMES[ch] || "Aircraft");
+      tracks.push(trackBytes([[0, [0xff, 0x03, ...vlq(name.length), ...name], 0], [0, [0xc0 | ch, GM[ch] ?? 0], 0], ...byCh.get(ch)]));
+    }
+    const header = chunk("MThd", [0, 1, 0, tracks.length, (PPQ >> 8) & 255, PPQ & 255]);
+    return new Blob([new Uint8Array([...header, ...tracks.flat()])], { type: "audio/midi" });
+  }
+  $("midiSave").addEventListener("click", () => {
+    const blob = buildMidi();
+    if (!blob) { showThanks("No notes yet. Turn the sound on and let the beam go around a few times first."); return; }
+    saveBlob(blob, `${fileStem()}.mid`);
+    showThanks("Saved as a MIDI file. Open it in any music app to hear each kind of aircraft on its own instrument.");
+  });
+
+  // MIDI: play live on a connected instrument or music app (Chrome, Edge, and Android)
+  let midiAccess = null, midiOut = null, padLive = [];
+  if (navigator.requestMIDIAccess) $("midiLiveFld").hidden = false;
+  function listMidi() {
+    const sel = $("midiOut"), keep = sel.value;
+    sel.textContent = "";
+    const off = document.createElement("option"); off.value = ""; off.textContent = "Off"; sel.append(off);
+    for (const o of midiAccess.outputs.values()) { const op = document.createElement("option"); op.value = o.id; op.textContent = o.name || "MIDI output"; sel.append(op); }
+    sel.value = [...sel.options].some((o) => o.value === keep) ? keep : "";
+    sel.hidden = false;
+    $("midiConnect").hidden = true;
+    if (sel.options.length === 1) { $("midiConnect").hidden = false; $("midiConnect").textContent = "No instruments found. Look again"; sel.hidden = true; }
+  }
+  $("midiConnect").addEventListener("click", async () => {
+    try { midiAccess = await navigator.requestMIDIAccess(); midiAccess.onstatechange = listMidi; listMidi(); }
+    catch (e) { $("midiConnect").textContent = "MIDI access was blocked"; }
+  });
+  $("midiOut").addEventListener("change", (e) => {
+    midiPad([]);
+    midiOut = e.target.value && midiAccess ? midiAccess.outputs.get(e.target.value) : null;
+    if (midiOut) { try { for (const ch of Object.keys(GM)) midiOut.send([0xc0 | Number(ch), GM[ch]]); } catch (err) {} if (chord && S.pad && S.style === "composed") midiPad(padNotes(48)); }
+  });
+  function midiLive(m, vel, dur, ch) {
+    if (!midiOut) return;
+    const t = performance.now() + 20;
+    try { midiOut.send([0x90 | ch, m, vel], t); midiOut.send([0x80 | ch, m, 0], t + Math.max(90, dur * 1000)); } catch (e) {}
+  }
+  function midiPad(ns) {
+    if (!midiOut) { padLive = []; return; }
+    try { for (const m of padLive) midiOut.send([0x85, m, 0]); for (const m of ns) midiOut.send([0x95, m, 44]); } catch (e) {}
+    padLive = ns.slice();
+  }
+
+  // Poster: every flight path heard since arriving, print-ready at 3000 × 4000
+  function clock(d, suffix) {
+    let h = d.getHours(); const ap = h < 12 ? "a" : "p"; h = h % 12 || 12;
+    const mm = d.getMinutes();
+    return `${h}${mm ? ":" + String(mm).padStart(2, "0") : ""}${suffix ? ap : ""}`;
+  }
+  function clockRange(a, b) {
+    const x = new Date(a), y = new Date(b);
+    if (b - a < 60000) return clock(x, true);
+    return (x.getHours() < 12) === (y.getHours() < 12) ? `${clock(x, false)}–${clock(y, true)}` : `${clock(x, true)}–${clock(y, true)}`;
+  }
+  function fitFont(g, text, weight, family, maxPx, width) {
+    let px = maxPx;
+    do { g.font = `${weight} ${px}px ${family}`; px -= 6; } while (g.measureText(text).width > width && px > 40);
+  }
+  async function makePoster() {
+    const btn = $("posterBtn");
+    if (!hasCenter() || session.trails.size < 3 || !session.start || Date.now() - session.start < 45000) {
+      showThanks("Listen for a minute or two first, so the beam has some flight paths to draw.");
+      return;
+    }
+    btn.disabled = true; btn.textContent = "Drawing…";
+    try {
+      try { await Promise.all([document.fonts.load(`800 120px "Big Shoulders Display"`), document.fonts.load(`600 120px "Big Shoulders Display"`), document.fonts.load(`500 40px "IBM Plex Mono"`), document.fonts.load(`400 60px "Barlow"`)]); } catch (e) {}
+      const W = 3000, H = 4000, M = 230;
+      const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+      const g = cv.getContext("2d");
+      const spaced = (px) => { if ("letterSpacing" in g) g.letterSpacing = px + "px"; };
+      g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
+      // heading
+      g.textBaseline = "alphabetic"; g.textAlign = "left";
+      spaced(14); g.fillStyle = C.beam; g.font = `500 52px ${fonts.mono}`;
+      g.fillText("SKY SWEEP", M, M + 30);
+      spaced(4); g.fillStyle = C.ink;
+      const title = placeLabel().replace(/^Near /, "").toUpperCase();
+      fitFont(g, title, 800, fonts.display, 330, W - 2 * M);
+      g.fillText(title, M - 6, M + 340);
+      spaced(0); g.fillStyle = C.muted; g.font = `400 64px ${fonts.body}`;
+      const dayTxt = new Date(session.start).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+      g.fillText(`${dayTxt} · ${clockRange(session.start, Date.now())}`, M, M + 460);
+      // the circle
+      const cx = W / 2, cy = 2170, Rp = 1230;
+      const maxR = Math.max(session.maxR, R, 40);
+      const k = Rp / maxR; // px per mile
+      const kx = Math.cos(rad(center.lat));
+      const xy = (lat, lon) => [cx + wrap(lon - center.lon) * 69.17 * kx * k, cy - (lat - center.lat) * MI_LAT * k];
+      const path = (pts, close) => { g.beginPath(); let px = null; pts.forEach(([lo, la], i) => { const [x, y] = xy(la, lo); if (i === 0 || (px !== null && Math.abs(x - px) > W)) g.moveTo(x, y); else g.lineTo(x, y); px = x; }); if (close) g.closePath(); };
+      g.save();
+      g.beginPath(); g.arc(cx, cy, Rp, 0, TAU); g.clip();
+      g.fillStyle = C.panel; g.fillRect(cx - Rp, cy - Rp, 2 * Rp, 2 * Rp);
+      g.lineJoin = "round";
+      if (inUS()) {
+        g.fillStyle = C.land; for (const ring of MAPGEO.nation) { path(ring, true); g.fill(); }
+        g.strokeStyle = alpha(C.staff, 0.16); g.lineWidth = 2.5; for (const l of MAPGEO.states) { path(l, false); g.stroke(); }
+        g.strokeStyle = alpha(C.staff, 0.22); for (const l of MAPGEO.land) { path(l, false); g.stroke(); }
+      } else {
+        g.fillStyle = C.land; for (const ring of MAPGEO.world) { path(ring, true); g.fill(); }
+        g.strokeStyle = alpha(C.staff, 0.22); g.lineWidth = 2.5; for (const ring of MAPGEO.world) { path(ring, true); g.stroke(); }
+      }
+      g.strokeStyle = alpha(C.staff, 0.2); g.lineWidth = 2; g.setLineDash([6, 14]);
+      for (const f of [1 / 3, 2 / 3]) { g.beginPath(); g.arc(cx, cy, Rp * f, 0, TAU); g.stroke(); }
+      g.setLineDash([]);
+      // a still frame of the beam
+      const th = rad(52);
+      for (let i = 0; i < 24; i++) {
+        const a1 = th - (rad(55) * i) / 24, a0 = th - (rad(55) * (i + 1)) / 24;
+        g.fillStyle = alpha(C.beam, 0.11 * (1 - i / 24));
+        g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, Rp, a0 - Math.PI / 2, a1 - Math.PI / 2); g.closePath(); g.fill();
+      }
+      // flight paths, colored by altitude
+      g.globalCompositeOperation = "lighter";
+      const paths = { low: new Path2D(), mid: new Path2D(), high: new Path2D() };
+      for (const tr of session.trails.values()) {
+        for (let i = 1; i < tr.length; i++) {
+          const p0 = tr[i - 1], p1 = tr[i];
+          if (!p0 || !p1) continue;
+          const pa = paths[altBand(p1[2])];
+          pa.moveTo(cx + p0[0] * k, cy - p0[1] * k); pa.lineTo(cx + p1[0] * k, cy - p1[1] * k);
+        }
+      }
+      g.lineCap = "round"; g.lineWidth = 4.5;
+      for (const b of ["low", "mid", "high"]) { g.strokeStyle = alpha(bandColor(b), 0.55); g.stroke(paths[b]); }
+      g.globalCompositeOperation = "source-over";
+      // every note, where it played
+      for (const [dx, dy, b] of session.hits) {
+        const x = cx + dx * k, y = cy - dy * k;
+        g.fillStyle = alpha(bandColor(b), 0.16); g.beginPath(); g.arc(x, y, 22, 0, TAU); g.fill();
+      }
+      for (const [dx, dy, b] of session.hits) {
+        const x = cx + dx * k, y = cy - dy * k;
+        g.fillStyle = bandColor(b); g.beginPath(); g.arc(x, y, 8.5, 0, TAU); g.fill();
+      }
+      g.strokeStyle = C.beam; g.lineWidth = 5;
+      g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + Rp * Math.sin(th), cy - Rp * Math.cos(th)); g.stroke();
+      g.restore();
+      g.strokeStyle = alpha(C.beam, 0.8); g.lineWidth = 4;
+      g.beginPath(); g.arc(cx, cy, Rp, 0, TAU); g.stroke();
+      g.fillStyle = C.beam; g.beginPath(); g.arc(cx, cy, 16, 0, TAU); g.fill();
+      g.strokeStyle = C.ink; g.lineWidth = 4; g.beginPath(); g.arc(cx, cy, 30, 0, TAU); g.stroke();
+      g.fillStyle = alpha(C.staff, 0.6); g.font = `500 44px ${fonts.mono}`; g.textAlign = "center"; g.textBaseline = "middle";
+      g.fillText("N", cx, cy - Rp - 50); g.fillText("S", cx, cy + Rp + 50); g.fillText("E", cx + Rp + 50, cy); g.fillText("W", cx - Rp - 50, cy);
+      g.textAlign = "left"; g.font = `400 34px ${fonts.mono}`; g.fillStyle = alpha(C.staff, 0.55);
+      for (const f of [1 / 3, 2 / 3, 1]) g.fillText(Math.round(maxR * f) + " mi", cx + Rp * f * 0.7071 + 12, cy - Rp * f * 0.7071 - 12);
+      // numbers
+      const mins = Math.max(1, Math.round((Date.now() - session.start) / 60000));
+      const stats = [[session.planes.size || session.trails.size, "aircraft"], [session.notes, "notes"], [mins, mins === 1 ? "minute" : "minutes"]];
+      g.textBaseline = "alphabetic";
+      stats.forEach(([n, lab], i) => {
+        const x = W / 6 + (i * W) / 3;
+        g.textAlign = "center"; g.fillStyle = C.ink; g.font = `800 190px ${fonts.display}`;
+        g.fillText(Number(n).toLocaleString(), x, 3660);
+        spaced(10); g.fillStyle = C.muted; g.font = `500 40px ${fonts.mono}`;
+        g.fillText(lab.toUpperCase(), x, 3730); spaced(0);
+      });
+      const sc = SCALES[S.scale] || SCALES.majpent;
+      g.fillStyle = C.muted; g.font = `400 40px ${fonts.body}`; g.textAlign = "left";
+      g.fillText(`${KEYNAMES[Number(S.key)]} ${sc.name}${session.sample ? " · sample traffic" : ""}  ·  orange below 10,000 ft, blue 10,000–25,000 ft, purple above`, M, 3860);
+      g.fillStyle = alpha(C.muted, 0.8); g.font = `400 30px ${fonts.mono}`;
+      g.fillText(`${location.host}${location.pathname.replace(/index\.html$/, "")}  ·  Aircraft data © adsb.lol contributors (ODbL)`, M, 3920);
+      const blob = await new Promise((res) => cv.toBlob(res, "image/png"));
+      if (!blob) throw new Error("no image");
+      const url = URL.createObjectURL(blob);
+      const old = $("posterImg").src; if (old && old.startsWith("blob:")) URL.revokeObjectURL(old);
+      $("posterImg").src = url;
+      $("posterDl").href = url; $("posterDl").download = `${fileStem()}.png`;
+      $("posterSheet").hidden = false;
+      showThanks("Your poster is ready.");
+    } catch (e) {
+      showThanks("Couldn't draw the poster on this device. Try again on a computer.");
+    } finally {
+      btn.disabled = false; btn.textContent = "Make a poster of this sky";
+    }
+  }
+  $("posterBtn").addEventListener("click", makePoster);
+  $("posterClose").addEventListener("click", () => ($("posterSheet").hidden = true));
+  $("posterSheet").addEventListener("click", (e) => { if (e.target === $("posterSheet")) $("posterSheet").hidden = true; });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("posterSheet").hidden = true; });
+
+  // ---------- Venue display: ?kiosk=1&lat=..&lon=..&name=.. ----------
+  let autoStarted = false;
+  const DIRS = ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"];
+  const KTIPS = [
+    "Big jets play the low notes. Airliners ring like bells. Small planes pluck the high ones.",
+    "Close planes play louder. Faraway planes sound farther off, down in the echo.",
+    "A plane heading toward us slides up into its note. One flying away droops a little.",
+    "The beam reaches farther when the sky is quiet, so the music never stops.",
+    "Every quarter turn of the beam, the chord changes, so the notes always fit together.",
+    "Colors show height: orange below 10,000 feet, blue in the middle, purple above 25,000 feet.",
+    "Each plane radios its position about once a second. Volunteers' antennas on the ground pick it up.",
+    "Planes to the east play a little more on the right; planes to the west, on the left.",
+  ];
+  function kioskNote({ a, p, r, name, band, motion }) {
+    const n = $("kNote");
+    n.textContent = name.replace(/-?\d+$/, "").replace("#", "♯");
+    n.className = "k-note " + band;
+    $("kCs").textContent = a.cs;
+    $("kType").textContent = typeName(a.type) || INST_LABEL[instrumentFor(a.cat)] || "Aircraft";
+    const bits = [];
+    if (p.alt != null) bits.push(`${(Math.round(p.alt / 100) * 100).toLocaleString()} feet up`);
+    if (p.gs != null) bits.push(`${Math.round(p.gs * 1.15078)} mph`);
+    bits.push(`${Math.max(1, Math.round(r.d))} ${Math.round(r.d) === 1 ? "mile" : "miles"} ${DIRS[Math.round(r.b / (TAU / 8)) % 8]}`);
+    if (motion > 0) bits.push("coming closer"); else if (motion < 0) bits.push("flying away");
+    $("kMeta").textContent = bits.join(" · ");
+  }
+  function kioskTitle() {
+    if (!hasCenter()) return "The sky above us";
+    if (center.kind === "you") return center.town ? center.town.split(",")[0] : "The sky above us";
+    return (center.name || "The sky above us").split(",")[0];
+  }
+  let qrFor = "";
+  function kioskQr() {
+    if (!hasCenter()) return;
+    const u = `${location.origin}${location.pathname}?lat=${center.lat.toFixed(2)}&lon=${center.lon.toFixed(2)}&name=${encodeURIComponent(kioskTitle())}`;
+    if (u === qrFor) return;
+    qrFor = u;
+    const draw = () => {
+      try { const q = window.qrcode(0, "M"); q.addData(u); q.make(); $("kQr").innerHTML = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true }); } catch (e) {}
+    };
+    if (window.qrcode) return draw();
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js";
+    s.onload = draw;
+    document.head.append(s);
+  }
+  function startKiosk() {
+    document.body.classList.add("kiosk-on");
+    $("kiosk").hidden = false;
+    $("kMap").append(document.querySelector(".mapwrap"));
+    S.labels = true;
+    let ti = 0;
+    const tip = $("kTip");
+    tip.textContent = KTIPS[0];
+    setInterval(() => { tip.style.opacity = 0; setTimeout(() => { ti = (ti + 1) % KTIPS.length; tip.textContent = KTIPS[ti]; tip.style.opacity = 1; }, 600); }, 14000);
+    setInterval(() => { $("kLive").textContent = mode === "live" ? "● Live" : mode === "sample" ? "Sample traffic" : ""; }, 1000);
+    // Sound: starts on its own where the browser allows it (a kiosk browser), otherwise after one tap
+    try { initAudio(); } catch (e) {}
+    const begin = () => { $("kStart").hidden = true; if (!soundOn) toggleSound(); };
+    if (A && A.ctx.state === "running") { autoStarted = true; toggleSound(); }
+    else {
+      $("kStart").hidden = false;
+      $("kStart").addEventListener("click", begin);
+      document.addEventListener("keydown", begin, { once: true });
+      setTimeout(async () => { try { await A.ctx.resume(); } catch (e) {} if (A && A.ctx.state === "running" && !soundOn) { autoStarted = true; begin(); } }, 400);
+    }
+    // Hide the pointer when nobody's using it
+    let idle = null;
+    const wake = () => { document.body.classList.remove("kiosk-idle"); clearTimeout(idle); idle = setTimeout(() => document.body.classList.add("kiosk-idle"), 3000); };
+    ["pointermove", "pointerdown"].forEach((ev) => document.addEventListener(ev, wake, { passive: true }));
+    wake();
+    // Stay healthy on a screen that runs all day: refresh once overnight, or if the feed has been silent a long time
+    const bootAt = Date.now();
+    setInterval(() => {
+      if (!autoStarted) return;
+      const stale = everLive && Date.now() - lastData > 10 * 60000;
+      if (stale || (Date.now() - bootAt > 20 * 3600000 && new Date().getHours() === 4)) location.reload();
+    }, 60000);
+  }
 
   // ---------- Tune the sweep ----------
   function renderReadouts() {
@@ -1416,6 +1999,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   $("resetTune").addEventListener("click", () => { Object.assign(S, DEFAULTS); changed(); });
   renderTune();
 
+  if (KIOSK) startKiosk();
   renderWhere();
   resize();
   setInterval(updateStatus, 1000);
