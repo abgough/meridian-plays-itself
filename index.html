@@ -157,7 +157,7 @@
       <button id="sound" type="button" aria-pressed="false">Sound on</button>
       <span class="status" id="status" data-mode="connecting"><i></i><span id="statusText">Connecting to the aircraft feed</span></span>
     </div>
-    <p class="hint">The sky plays back 45 seconds behind real time. On iPhone, turn off Silent Mode to hear it.</p>
+    <p class="hint">The sky plays back 45 seconds behind real time. On mobile, turn off silent mode to hear it.</p>
   </header>
 
   <div class="banner" id="sampleBanner" hidden><b>Sample traffic.</b> The live aircraft feed couldn't be reached, so these flights are generated to show how it plays. The page keeps trying and switches to real aircraft as soon as the feed answers.</div>
@@ -202,6 +202,14 @@
       <details class="tune" id="tune">
         <summary><h2>Tune the sweep</h2><span class="tune-sum" id="tuneSum"></span></summary>
         <div class="tune-body">
+          <div class="fld">
+            <label for="style">Style</label>
+            <select id="style">
+              <option value="composed">Composed: chords that turn with the beam</option>
+              <option value="simple">Simple: one scale, no chords</option>
+            </select>
+            <label class="check" style="margin-top:6px"><input id="pad" type="checkbox"> Soft chord pad underneath</label>
+          </div>
           <div class="fld">
             <span class="lab">Beam reach <output id="reachOut"></output></span>
             <div class="seg" role="group" aria-label="Beam reach"><button type="button" data-set="reachMode" data-val="auto">Auto</button><button type="button" data-set="reachMode" data-val="set">Set</button></div>
@@ -279,7 +287,7 @@
   </main>
 
   <section class="score" aria-label="Score">
-    <h2>The Score</h2>
+    <h2>The Score <span id="chordNow" style="font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0;color:var(--beam);margin-left:8px"></span></h2>
     <canvas id="score"></canvas>
     <div class="score-foot"><span>1 minute ago</span><span>now</span></div>
   </section>
@@ -289,9 +297,11 @@
     <dl>
       <div><dt>The beam</dt><dd>A line from the center sweeps clockwise like a radar. Each plane it passes plays one note.</dd></div>
       <div><dt>Reach and tempo</dt><dd>The beam reaches out until it has about two dozen airborne planes to play, from 60 miles on a busy afternoon to nearly 300 in the middle of the night. It sweeps faster when there are few planes and slower when there are many, so the music stays between about 40 and 100 notes a minute.</dd></div>
-      <div><dt>Distance</dt><dd>By default, sets the pitch on a five-note scale. Planes close to the center sing high; planes at the edge of the beam sound low.</dd></div>
-      <div><dt>Altitude</dt><dd>Sets the register. Below 10,000 ft (mostly arrivals and departures) plays an octave down, and above 25,000 ft (jets at cruise) plays an octave up.</dd></div>
-      <div><dt>Aircraft class</dt><dd>Sets the instrument and rhythm. Small planes and regional jets pluck, airliners ring like a bell, heavies swell with a double strike, and helicopters chop in threes.</dd></div>
+      <div><dt>Harmony</dt><dd>Each quarter-turn of the beam moves to the next chord of a short progression, and every plane plays a tone of the current chord, so the notes always fit together. A soft pad holds the chord underneath.</dd></div>
+      <div><dt>Size</dt><dd>Sets the voice. Big jets are the bass, airliners carry the melody on bells, small planes and business jets pluck high, and helicopters tap softly.</dd></div>
+      <div><dt>Distance</dt><dd>Close planes sing higher, louder, and drier. Faraway planes sound lower, softer, and farther off in the echo.</dd></div>
+      <div><dt>Altitude</dt><dd>Planes at cruise ring long and airy; planes low near an airport play short, close notes.</dd></div>
+      <div><dt>Coming or going</dt><dd>A plane heading toward you scoops up into its note, bright. One heading away sags a little at the end and sounds darker, like a train passing.</dd></div>
       <div><dt>Where it is</dt><dd>Planes east of you sound in your right ear and planes to the west in your left.</dd></div>
       <div><dt>Make it yours</dt><dd>Open Tune the sweep to set how far the beam reaches, how fast it plays, what sets the pitch, and the scale, key, and sound. On the beat locks the notes to a tempo. Tap any plane to see its callsign, type, altitude, and speed.</dd></div>
     </dl>
@@ -330,10 +340,11 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   const TAU = Math.PI * 2;
 
   // ---------- Settings (remembered on this device only) ----------
-  const DEFAULTS = { reachMode: "auto", reach: 150, tempoMode: "auto", npm: 60, pitch: "distance", sound: "auto", scale: "majpent", key: 0, timing: "free", bpm: 96, echo: 40, vol: 85, labels: false };
+  const DEFAULTS = { style: "composed", pad: true, reachMode: "auto", reach: 150, tempoMode: "auto", npm: 60, pitch: "distance", sound: "auto", scale: "majpent", key: 0, timing: "beat", bpm: 96, echo: 40, vol: 85, labels: true };
   const S = { ...DEFAULTS };
-  try { Object.assign(S, JSON.parse(localStorage.getItem("skysweep-settings") || "{}")); } catch (e) {}
-  function saveSettings() { try { localStorage.setItem("skysweep-settings", JSON.stringify(S)); } catch (e) {} }
+  const STORE = "skysweep-settings-v2";
+  try { Object.assign(S, JSON.parse(localStorage.getItem(STORE) || "{}")); } catch (e) {}
+  function saveSettings() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} }
 
   const center = loadCenter(); // { lat, lon, name }, or lat null until the visitor chooses
   function loadCenter() {
@@ -383,6 +394,44 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
   }
   const noteName = (m) => PCNAMES[((m % 12) + 12) % 12] + (Math.floor(m / 12) - 1);
   buildScale();
+
+  // Composed style: each quarter-turn of the beam moves to the next chord of a short progression,
+  // and every note is a tone of the current chord, voiced by aircraft size.
+  const PARENT = { majpent: "major", minpent: "minor", blues: "minor", major: "major", minor: "minor", dorian: "dorian", lydian: "lydian", whole: "whole" };
+  const MODES = { major: [0, 2, 4, 5, 7, 9, 11], minor: [0, 2, 3, 5, 7, 8, 10], dorian: [0, 2, 3, 5, 7, 9, 10], lydian: [0, 2, 4, 6, 7, 9, 11], whole: [0, 2, 4, 6, 8, 10] };
+  const PROG = { major: [0, 5, 3, 4], minor: [0, 5, 2, 6], dorian: [0, 3, 0, 6], lydian: [0, 1, 0, 4], whole: [0, 1, 2, 1] };
+  const ROLE = (cat) => (cat === "A5" || cat === "A6" ? "bass" : cat === "A1" || cat === "A2" ? "high" : cat === "A7" ? "perc" : "mid");
+  const RANGES = { bass: [38, 55], mid: [60, 81], high: [72, 93], perc: [57, 69] };
+  const lastNote = { bass: null, mid: null, high: null, perc: null };
+  let chordIx = 0, chord = null;
+  const pcOf = (m) => ((m % 12) + 12) % 12;
+  function buildChord() {
+    const mode = MODES[PARENT[S.scale] || "major"], prog = PROG[PARENT[S.scale] || "major"];
+    const n = mode.length, key = Number(S.key) || 0, deg = prog[chordIx % prog.length];
+    const at = (x) => mode[x % n] + 12 * Math.floor(x / n) + key;
+    const tones = [at(deg), at(deg + 2), at(deg + 4)];
+    const third = tones[1] - tones[0], fifth = tones[2] - tones[0];
+    const q = fifth === 6 ? "°" : fifth === 8 ? "+" : third === 3 ? "m" : "";
+    chord = { pcs: tones.map(pcOf), name: KEYNAMES[pcOf(tones[0])] + q };
+    const el = document.getElementById("chordNow");
+    if (el) el.textContent = S.style === "composed" ? `Now: ${chord.name}` : "";
+  }
+  function pickComposed(role, k) {
+    const [lo, hi] = RANGES[role];
+    let want = chord.pcs;
+    if (role === "bass") want = [chord.pcs[0], chord.pcs[2]];      // roots and fifths down low
+    if (role === "perc") want = [chord.pcs[2]];                     // helicopters tap the fifth
+    const cands = [];
+    for (let m = lo; m <= hi; m++) if (want.includes(pcOf(m))) cands.push(m);
+    const target = lo + k * (hi - lo), prev = lastNote[role];
+    const pref = prev == null ? target : 0.55 * target + 0.45 * prev; // lean toward the last note: smooth lines
+    cands.sort((a, b) => Math.abs(a - pref) - Math.abs(b - pref));
+    let m = cands[0];
+    if (m === prev && cands[1] != null && Math.abs(cands[1] - pref) <= 5) m = cands[1];
+    lastNote[role] = m;
+    return m;
+  }
+  buildChord();
   const SHIFT = { low: -12, mid: 0, high: 12 };
   const INST_LABEL = { pluck: "Small aircraft", bell: "Airliner", heavy: "Heavy", rotor: "Helicopter", glass: "Other" };
   const altBand = (alt) => (alt < 10000 ? "low" : alt < 25000 ? "mid" : "high");
@@ -492,6 +541,8 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     P += (Ptarget - P) * Math.min(1, dt / 6);
     const prev = theta;
     theta = (theta + (TAU * dt) / P) % TAU;
+    const quad = Math.floor(theta / (TAU / 4));
+    if (quad !== Math.floor(prev / (TAU / 4))) { chordIx++; buildChord(); updatePad(); }
     const crossed = (b) => (prev <= theta ? b > prev && b <= theta : b > prev || b <= theta);
     for (const v of visible) {
       if (v.p.ground || v.p.alt == null || v.r.d > R) continue;
@@ -509,14 +560,35 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     else if (S.pitch === "direction") k = r.b / TAU;
     else if (S.pitch === "speed") k = clamp01(((p.gs ?? 250) - 80) / 480);
     else k = clamp01(1 - r.d / R); // 1 at the center, 0 at the edge
-    const idx = Math.round(k * (NOTES.length - 1));
     const band = altBand(p.alt);
-    const shift = S.pitch === "altitude" ? 0 : SHIFT[band];
     const inst = S.sound === "auto" ? instrumentFor(a.cat) : S.sound;
     const pan = Math.max(-0.8, Math.min(0.8, r.dx / R));
-    const m = NOTES[idx] + shift;
+    // Is it heading toward the center or away? (knots of closing speed)
+    const closing = p.gs != null && p.trk != null && r.d > 1 ? p.gs * Math.cos(rad(p.trk) - (r.b + Math.PI)) : 0;
+    const motion = closing > 60 ? 1 : closing < -60 ? -1 : 0;
+    a.motion = motion;
+    let m, note;
+    if (S.style === "composed") {
+      const role = ROLE(a.cat);
+      m = pickComposed(role, k);
+      const near = clamp01(1 - r.d / R), high = p.alt >= 25000, low = p.alt < 10000;
+      note = {
+        midi: m, pan, inst,
+        vel: (0.55 + 0.45 * near) * (motion < 0 ? 0.8 : 1) * (inst === "pluck" ? 0.85 : 1) * (role === "perc" ? 0.6 : 1),
+        dur: Math.min(durationFor(p.gs) * (high ? 1.25 : low ? 0.7 : 1), Math.max(0.4, P / 5)),
+        send: 0.1 + 0.55 * (1 - near) + (high ? 0.12 : 0),   // far away: more echo, like distance
+        cutoff: motion > 0 ? 12000 : motion < 0 ? 3600 : 8000, // coming closer: brighter; leaving: darker
+        bend: motion,                                         // scoop up when approaching, sag when leaving
+      };
+    } else {
+      const idx = Math.round(k * (NOTES.length - 1));
+      const shift = S.pitch === "altitude" ? 0 : SHIFT[band];
+      m = NOTES[idx] + shift;
+      note = { midi: m, dur: Math.min(durationFor(p.gs), Math.max(0.4, P / 6)), pan, inst, vel: inst === "pluck" ? 0.8 : 1 };
+    }
     const name = noteName(m);
-    playNote({ midi: m, dur: Math.min(durationFor(p.gs), Math.max(0.4, P / 6)), pan, inst, vel: inst === "pluck" ? 0.8 : 1 });
+    playNote(note);
+    try { window.dispatchEvent(new CustomEvent("skysweep:note", { detail: { midi: m, inst, motion, d: Math.round(r.d), alt: p.alt, cat: a.cat } })); } catch (e) {}
     notes++;
     recentTimes.push(now);
     $("count").textContent = notes.toLocaleString();
@@ -548,7 +620,8 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     kind.textContent = [a.type, INST_LABEL[inst]].filter(Boolean).join(" · ");
     const meta = document.createElement("span");
     meta.className = "meta";
-    meta.textContent = [p.alt != null ? Math.round(p.alt).toLocaleString() + " ft" : null, p.gs != null ? Math.round(p.gs) + " kt" : null, `${Math.round(r.d)} mi ${compass(r.b)}`, fmtTime(new Date(t))].filter(Boolean).join(" · ");
+    const mv = a.motion > 0 ? "coming closer" : a.motion < 0 ? "heading away" : null;
+    meta.textContent = [p.alt != null ? Math.round(p.alt).toLocaleString() + " ft" : null, p.gs != null ? Math.round(p.gs) + " kt" : null, `${Math.round(r.d)} mi ${compass(r.b)}`, mv, fmtTime(new Date(t))].filter(Boolean).join(" · ");
     who.append(b, kind, meta);
     li.append(note, who);
     const log = $("log");
@@ -565,19 +638,19 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     const Ctx = window.AudioContext || window.webkitAudioContext;
     const ctx = new Ctx();
     const comp = ctx.createDynamicsCompressor();
-    comp.threshold.value = -18; comp.ratio.value = 4; comp.attack.value = 0.01; comp.release.value = 0.3;
+    comp.threshold.value = -20; comp.knee.value = 12; comp.ratio.value = 3.5; comp.attack.value = 0.01; comp.release.value = 0.35;
     const out = ctx.createGain(); out.gain.value = Number(S.vol) / 100;
     comp.connect(out); out.connect(ctx.destination);
-    const bus = ctx.createGain();
-    const conv = ctx.createConvolver();
-    conv.buffer = makeIR(ctx, 3.4);
-    const wet = ctx.createGain(); wet.gain.value = (Number(S.echo) / 100) * 0.85;
-    bus.connect(comp); bus.connect(conv); conv.connect(wet); wet.connect(comp);
+    const dry = ctx.createGain(); dry.connect(comp);
+    const revIn = ctx.createGain();
+    const conv = ctx.createConvolver(); conv.buffer = makeIR(ctx, 3.8);
+    const wet = ctx.createGain(); wet.gain.value = (Number(S.echo) / 100) * 1.1;
+    revIn.connect(conv); conv.connect(wet); wet.connect(comp);
     const nlen = ctx.sampleRate * 0.2;
     const noise = ctx.createBuffer(1, nlen, ctx.sampleRate);
     const nd = noise.getChannelData(0);
     for (let i = 0; i < nlen; i++) nd[i] = Math.random() * 2 - 1;
-    A = { ctx, bus, noise, out, wet };
+    A = { ctx, dry, revIn, noise, out, wet };
   }
   function makeIR(ctx, sec) {
     const len = Math.floor(ctx.sampleRate * sec);
@@ -585,15 +658,25 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     for (let ch = 0; ch < 2; ch++) { const d = buf.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.8); }
     return buf;
   }
-  function outFor(pan) {
-    const { ctx, bus } = A;
+  // Each note: gain -> tone filter -> pan -> dry, plus an echo send (more for faraway planes)
+  function outFor(pan, send = 0.3, cutoff = 6000) {
+    const { ctx } = A;
     const g = ctx.createGain();
-    if (ctx.createStereoPanner) { const p = ctx.createStereoPanner(); p.pan.value = pan; g.connect(p); p.connect(bus); } else g.connect(bus);
+    const f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = cutoff; f.Q.value = 0.5;
+    g.connect(f);
+    let tail = f;
+    if (ctx.createStereoPanner) { const p = ctx.createStereoPanner(); p.pan.value = pan; f.connect(p); tail = p; }
+    const d = ctx.createGain(); d.gain.value = 1 - send * 0.45; tail.connect(d); d.connect(A.dry);
+    const w = ctx.createGain(); w.gain.value = send; tail.connect(w); w.connect(A.revIn);
     return g;
   }
+  let curBend = 0; // +1: scoop up into the note (approaching), -1: sag at the end (leaving)
   function osc(type, f, t, end, dest) {
     const o = A.ctx.createOscillator();
-    o.type = type; o.frequency.setValueAtTime(f, t);
+    o.type = type;
+    if (curBend > 0) { o.frequency.setValueAtTime(f * 0.944, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.09); }
+    else if (curBend < 0) { o.frequency.setValueAtTime(f, t); o.frequency.setValueAtTime(f, t + Math.min(0.3, (end - t) * 0.35)); o.frequency.exponentialRampToValueAtTime(f * 0.968, end); }
+    else o.frequency.setValueAtTime(f, t);
     o.connect(dest); o.start(t); o.stop(end + 0.05);
     return o;
   }
@@ -616,7 +699,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     mg.gain.exponentialRampToValueAtTime(f * 0.04, t + Math.min(dur, 1.2) + 0.05);
     mod.connect(mg); mg.connect(car.frequency);
     mod.start(t); mod.stop(end + 0.05);
-    osc("sine", f * 3.01, t, t + 0.6, envGain(out, t, 0.004, 0.06 * vel, t + 0.6));
+    osc("sine", f * 3.01, t, t + 0.7, envGain(out, t, 0.004, 0.09 * vel, t + 0.7));
     return end;
   }
   function pluck(f, t, dur, vel, out) {
@@ -646,7 +729,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     g.connect(flt);
     osc("sawtooth", f * 0.9965, t, end, g);
     osc("sawtooth", f * 1.0035, t, end, g);
-    if (f > 70) osc("sine", f / 2, t, end, envGain(out, t, 0.12, 0.15 * vel, end));
+    if (f > 110) osc("sine", f / 2, t, end, envGain(out, t, 0.12, 0.11 * vel, end));
     bell(f, t, 0.5, 0.7 * vel, out);
     bell(f, t + 0.21, 0.45, 0.5 * vel, out);
     return end;
@@ -672,7 +755,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     return end;
   }
   const VOICES = { bell, pluck, heavy, rotor, glass };
-  function playNote({ midi, dur, pan, inst, vel }) {
+  function playNote({ midi, dur, pan, inst, vel, send = 0.3, cutoff = 6000, bend = 0 }) {
     if (!soundOn || !A || A.ctx.state !== "running") return;
     let t = A.ctx.currentTime + 0.02;
     if (S.timing === "beat") { const grid = 60 / Number(S.bpm) / 2; t = Math.ceil(t / grid) * grid; }
@@ -681,8 +764,38 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     const busy = voiceEnds.length;
     const v = vel * (busy > 3 ? Math.sqrt(3 / busy) : 1);
     const f = 440 * Math.pow(2, (midi - 69) / 12);
-    const end = VOICES[inst](f, t, dur, v, outFor(pan));
+    curBend = bend;
+    const end = VOICES[inst](f, t, dur, v, outFor(pan, send, cutoff));
+    curBend = 0;
     voiceEnds.push(end); voiceEnds.sort((x, y) => x - y);
+  }
+
+  // A quiet pad holding the current chord, so the music never drops to silence between planes
+  let pad = null;
+  function stopPad(fade = 2.2) {
+    if (!pad || !A) return;
+    const t = A.ctx.currentTime, g = pad.g;
+    g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(Math.max(g.gain.value, 0.0001), t); g.gain.linearRampToValueAtTime(0.0001, t + fade);
+    pad.oscs.forEach((o) => o.stop(t + fade + 0.1));
+    pad = null;
+  }
+  function updatePad() {
+    if (!A || !soundOn || !S.pad || S.style !== "composed" || !chord) { stopPad(); return; }
+    stopPad();
+    const ctx = A.ctx, t = ctx.currentTime;
+    const root = 60 + chord.pcs[0];
+    const up = (pc) => root + ((pc - chord.pcs[0] + 12) % 12);
+    const notes = [root, up(chord.pcs[2]), up(chord.pcs[1]) + 12];
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.013, t + 2.4);
+    const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1400;
+    g.connect(lp); lp.connect(A.dry);
+    const w = ctx.createGain(); w.gain.value = 0.5; lp.connect(w); w.connect(A.revIn);
+    const oscs = [];
+    for (const n of notes) for (const [type, det] of [["sine", 1], ["triangle", 1.0035]]) {
+      const o = ctx.createOscillator(); o.type = type; o.frequency.value = 440 * Math.pow(2, (n - 69) / 12) * det;
+      o.connect(g); o.start(t); oscs.push(o);
+    }
+    pad = { g, oscs };
   }
 
   let wakeLock = null;
@@ -696,6 +809,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
         btn.textContent = "Mute";
         btn.setAttribute("aria-pressed", "true");
         playNote({ midi: NOTES[Math.floor(NOTES.length / 2)] || 72, dur: 0.8, pan: 0, inst: "glass", vel: 0.7 });
+        updatePad();
         try { if (navigator.wakeLock) wakeLock = await navigator.wakeLock.request("screen"); } catch (e) {}
       } catch (e) { btn.textContent = "Sound unavailable"; }
     } else {
@@ -1233,6 +1347,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
       ["Speed", p.gs != null ? `${Math.round(p.gs)} kt (${Math.round(p.gs * 1.15078)} mph)` : "Unknown"],
       ["Heading", p.trk != null ? `${Math.round(p.trk)}° ${compass(rad(p.trk))}` : "Unknown"],
       ["From center", `${Math.round(r.d)} mi ${compass(r.b)}`],
+      ["Moving", a.motion > 0 ? "Coming closer" : a.motion < 0 ? "Heading away" : "Passing by"],
       ["Last note", a.flashName || "Not yet"],
     ];
     const dl = $("cardDl"); dl.textContent = "";
@@ -1267,7 +1382,7 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     $("bpmOut").textContent = S.timing === "beat" ? `${S.bpm} bpm` : "";
     $("echoOut").textContent = `${S.echo}%`;
     $("volOut").textContent = `${S.vol}%`;
-    $("tuneSum").textContent = `${KEYNAMES[Number(S.key)]} ${sc.name} · pitch by ${S.pitch}${S.reachMode === "set" ? ` · ${S.reach} mi` : ""}${S.timing === "beat" ? ` · ${S.bpm} bpm` : ""}`;
+    $("tuneSum").textContent = `${S.style === "composed" ? "Composed" : "Simple"} · ${KEYNAMES[Number(S.key)]} ${sc.name} · pitch by ${S.pitch}${S.reachMode === "set" ? ` · ${S.reach} mi` : ""}${S.timing === "beat" ? ` · ${S.bpm} bpm` : ""}`;
   }
   function renderTune() {
     document.querySelectorAll(".seg button[data-set]").forEach((b) => b.setAttribute("aria-pressed", String(S[b.dataset.set] === b.dataset.val)));
@@ -1276,14 +1391,17 @@ const WORLD={"q":10,"land":["-596,-800,-3,-5,-3,-5,-21,1,-22,0,-12,3,0,1,-6,2,23
     $("bpm").value = S.bpm; $("bpm").hidden = S.timing !== "beat";
     $("pitch").value = S.pitch; $("sound2").value = S.sound; $("scale").value = S.scale; $("key").value = String(S.key);
     $("echo").value = S.echo; $("vol").value = S.vol; $("labels").checked = !!S.labels;
+    $("style").value = S.style; $("pad").checked = !!S.pad; $("pad").disabled = S.style !== "composed";
     renderReadouts();
   }
   function applyAudio() {
     if (!A) return;
     A.out.gain.setTargetAtTime(Number(S.vol) / 100, A.ctx.currentTime, 0.05);
-    A.wet.gain.setTargetAtTime((Number(S.echo) / 100) * 0.85, A.ctx.currentTime, 0.05);
+    A.wet.gain.setTargetAtTime((Number(S.echo) / 100) * 1.1, A.ctx.currentTime, 0.05);
   }
-  function changed() { buildScale(); saveSettings(); renderTune(); applyAudio(); retune(); }
+  function changed() { buildScale(); buildChord(); saveSettings(); renderTune(); applyAudio(); retune(); updatePad(); }
+  $("style").addEventListener("change", (e) => { S.style = e.target.value; changed(); });
+  $("pad").addEventListener("change", (e) => { S.pad = e.target.checked; changed(); });
   document.querySelectorAll(".seg button[data-set]").forEach((b) => b.addEventListener("click", () => { S[b.dataset.set] = b.dataset.val; changed(); }));
   $("reach").addEventListener("input", (e) => { S.reach = Number(e.target.value); changed(); });
   $("npm").addEventListener("input", (e) => { S.npm = Number(e.target.value); changed(); });
